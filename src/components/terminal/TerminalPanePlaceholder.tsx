@@ -5,7 +5,6 @@ import { ConfirmDialog } from '@/components/shell/Dialogs';
 import { SHELL_PRESETS } from '@/components/modals/toolPresets';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTerminalStore } from '@/stores/terminalStore';
-import { useUiStore } from '@/stores/uiStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 const XtermTerminal = lazy(async () => {
