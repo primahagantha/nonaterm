@@ -531,7 +531,7 @@ export function OptionsMenu() {
                       </button>
                     ) : null}
                     <a
-                      href="https://github.com/RegenadeJester/nonaterm/blob/main/docs/theme-docs.md"
+                      href="https://github.com/primahagantha/nonaterm/blob/master/docs/theme-docs.md"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn--ghost btn--sm"
