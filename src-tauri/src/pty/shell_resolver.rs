@@ -209,12 +209,18 @@ impl ShellResolver {
     ) -> Result<ShellResolution, String> {
         match preset {
             ShellPreset::PowerShell => self.find_with_candidates(
-                &[&["powershell.exe", "powershell"][..], &["pwsh.exe", "pwsh"][..]],
+                &[
+                    &["powershell.exe", "powershell"][..],
+                    &["pwsh.exe", "pwsh"][..],
+                ],
                 ShellSource::Preset("PowerShell"),
                 args,
             ),
             ShellPreset::Pwsh => self.find_with_candidates(
-                &[&["pwsh.exe", "pwsh"][..], &["powershell.exe", "powershell"][..]],
+                &[
+                    &["pwsh.exe", "pwsh"][..],
+                    &["powershell.exe", "powershell"][..],
+                ],
                 ShellSource::Preset("PowerShell 7"),
                 args,
             ),
@@ -228,11 +234,7 @@ impl ShellResolver {
                             source: ShellSource::Environment("COMSPEC"),
                         });
                     }
-                    self.find_with_candidates(
-                        &[&["cmd.exe"][..]],
-                        ShellSource::Preset("CMD"),
-                        args,
-                    )
+                    self.find_with_candidates(&[&["cmd.exe"][..]], ShellSource::Preset("CMD"), args)
                 }
                 #[cfg(not(windows))]
                 {
@@ -410,7 +412,11 @@ fn windows_well_known() -> Vec<PathBuf> {
         dirs.push(PathBuf::from(programfiles_x86).join("Git").join("bin"));
     }
     if let Ok(localappdata) = std::env::var("LocalAppData") {
-        dirs.push(PathBuf::from(localappdata).join("Microsoft").join("WindowsApps"));
+        dirs.push(
+            PathBuf::from(localappdata)
+                .join("Microsoft")
+                .join("WindowsApps"),
+        );
     }
     if let Ok(systemroot) = std::env::var("SystemRoot") {
         let root = PathBuf::from(systemroot);
@@ -639,7 +645,10 @@ mod tests {
     #[test]
     fn parse_args_splits_quoted_segments() {
         let args = parse_args(r#"-NoLogo -Command "Write-Host hi" --foo 'bar baz'"#);
-        assert_eq!(args, vec!["-NoLogo", "-Command", "Write-Host hi", "--foo", "bar baz"]);
+        assert_eq!(
+            args,
+            vec!["-NoLogo", "-Command", "Write-Host hi", "--foo", "bar baz"]
+        );
     }
 
     #[test]
@@ -661,7 +670,10 @@ mod tests {
     fn expand_path_replaces_tilde_when_home_known() {
         let expanded = expand_path("~/projects");
         if home_dir().is_some() {
-            assert!(!expanded.starts_with('~'), "tilde should expand: got {expanded}");
+            assert!(
+                !expanded.starts_with('~'),
+                "tilde should expand: got {expanded}"
+            );
         }
     }
 
@@ -674,7 +686,9 @@ mod tests {
     #[test]
     fn resolver_falls_back_when_nothing_provided() {
         let resolver = ShellResolver::without_path();
-        let result = resolver.resolve(&spec("default", "", "")).expect("fallback should resolve");
+        let result = resolver
+            .resolve(&spec("default", "", ""))
+            .expect("fallback should resolve");
         // On Windows the fallback is cmd.exe; on Unix /bin/sh. Both are
         // guaranteed by the resolver itself.
         assert!(matches!(result.source, ShellSource::Fallback));
@@ -684,7 +698,11 @@ mod tests {
     fn resolver_rejects_missing_custom_path() {
         let resolver = ShellResolver::without_path();
         let err = resolver
-            .resolve(&spec("custom", "Z:\\definitely-not-a-real-shell-1234.exe", ""))
+            .resolve(&spec(
+                "custom",
+                "Z:\\definitely-not-a-real-shell-1234.exe",
+                "",
+            ))
             .expect_err("missing custom path should fail");
         assert!(err.contains("custom") || err.contains("not found"));
     }
@@ -693,9 +711,12 @@ mod tests {
     fn resolver_picks_cmd_preset_via_comspec() {
         if cfg!(windows) {
             let resolver = ShellResolver::without_path();
-            let result = resolver.resolve(&spec("cmd", "", "")).expect("cmd should resolve");
+            let result = resolver
+                .resolve(&spec("cmd", "", ""))
+                .expect("cmd should resolve");
             assert!(
-                matches!(result.source, ShellSource::Environment(_)) || matches!(result.source, ShellSource::Preset(_)),
+                matches!(result.source, ShellSource::Environment(_))
+                    || matches!(result.source, ShellSource::Preset(_)),
                 "unexpected source: {:?}",
                 result.source
             );

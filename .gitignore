@@ -11,6 +11,15 @@ dist-ssr/
 # Tauri
 src-tauri/target/
 
+# Keys & Secrets (NEVER commit)
+keys/
+*.key
+*.pem
+*.env
+.env
+.env.local
+.env.*.local
+
 # IDE
 .vscode/
 .idea/
@@ -21,6 +30,7 @@ src-tauri/target/
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log
@@ -29,7 +39,10 @@ logs/
 # Test
 coverage/
 
-# Env
-.env
-.env.local
-.env.*.local
+# Claude
+.claude/
+.agents/
+
+# Misc docs that don't need to be in repo
+CONTRIBUTING.md
+CHANGELOG.md

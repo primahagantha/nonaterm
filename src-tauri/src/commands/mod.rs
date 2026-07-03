@@ -30,14 +30,16 @@ pub use system::{
     system_get_log_lines, system_get_platform, system_health_check, system_install_update,
     system_read_text_file, system_register_global_hotkey, system_run_crash_simulation,
     system_run_idle_probe, system_run_multi_spawn_probe, system_run_perf_probe,
-    system_start_file_watcher,
-    system_run_throughput_probe, system_run_tty_responding_probe,
+    system_run_throughput_probe, system_run_tty_responding_probe, system_start_file_watcher,
     system_unregister_global_hotkey,
 };
 pub use templates::{templates_export, templates_import, templates_list, templates_materialize};
-pub use vault::{vault_create, vault_delete, vault_get, vault_list, vault_list_groups, vault_list_tags, vault_update};
+pub use vault::{
+    vault_create, vault_delete, vault_get, vault_list, vault_list_groups, vault_list_tags,
+    vault_update,
+};
 pub use window::{
-    workspace_close_window, workspace_list_windows, workspace_open_in_new_window,
-    window_save_position, window_restore_position,
+    window_restore_position, window_save_position, workspace_close_window, workspace_list_windows,
+    workspace_open_in_new_window,
 };
 pub use workspace::workspace_list;

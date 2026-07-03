@@ -83,7 +83,9 @@ impl TemplateExport {
             return Err("template `layoutPreset` is required".to_string());
         }
         if self.panes.is_empty() {
-            return Err("template must have at least one pane (got empty `panes` array)".to_string());
+            return Err(
+                "template must have at least one pane (got empty `panes` array)".to_string(),
+            );
         }
         for (index, pane) in self.panes.iter().enumerate() {
             if pane.title.trim().is_empty() {
@@ -299,7 +301,9 @@ mod tests {
     fn write_template_atomic_uses_tmp_then_rename() {
         // Negative case: write to directory yang tidak ada harus error
         // dan TIDAK membuat file orphan di parent.
-        let bad_path = std::env::temp_dir().join("definitely-not-a-real-dir-xyz").join("template.json");
+        let bad_path = std::env::temp_dir()
+            .join("definitely-not-a-real-dir-xyz")
+            .join("template.json");
         let ws = sample_workspace();
         let tpl = TemplateExport::from_workspace(&ws, Some("Neg"));
 

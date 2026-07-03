@@ -19,9 +19,12 @@ pub fn templates_list() -> Vec<WorkspaceTemplate> {
 /// accent, layout, pane count). Frontend akan pakai metadata ini
 /// untuk create workspace di store lokal.
 #[tauri::command]
-pub fn templates_materialize(id: String, name: Option<String>) -> Result<MaterializedWorkspace, String> {
-    let template_id = templates::TemplateId::parse(&id)
-        .ok_or_else(|| format!("unknown template id: `{id}`"))?;
+pub fn templates_materialize(
+    id: String,
+    name: Option<String>,
+) -> Result<MaterializedWorkspace, String> {
+    let template_id =
+        templates::TemplateId::parse(&id).ok_or_else(|| format!("unknown template id: `{id}`"))?;
     let template = templates::find_template(template_id)
         .ok_or_else(|| format!("template not found: `{id}`"))?;
     Ok(template.materialize(name.as_deref()))

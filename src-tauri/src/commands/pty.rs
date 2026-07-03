@@ -34,7 +34,15 @@ pub async fn pty_spawn(
 ) -> Result<PtySessionInfo, String> {
     state
         .pty_manager
-        .spawn_session(workspace_id, pane_id, shell, cwd, startup_command, rows, cols)
+        .spawn_session(
+            workspace_id,
+            pane_id,
+            shell,
+            cwd,
+            startup_command,
+            rows,
+            cols,
+        )
         .await
         .map(|session| PtySessionInfo {
             session_id: session.session_id,

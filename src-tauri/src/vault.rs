@@ -183,8 +183,8 @@ pub fn get_entry(db: &rusqlite::Connection, id: &str) -> Result<Option<VaultEntr
 /// Insert a new vault entry.
 pub fn insert_entry(db: &rusqlite::Connection, entry: &VaultEntry) -> Result<(), String> {
     let tags_json = serde_json::to_string(&entry.tags).unwrap_or_else(|_| "[]".to_string());
-    let auth_json =
-        serde_json::to_string(&entry.auth_type).unwrap_or_else(|_| r#"{"type":"Password","data":{"password":""}}"#.to_string());
+    let auth_json = serde_json::to_string(&entry.auth_type)
+        .unwrap_or_else(|_| r#"{"type":"Password","data":{"password":""}}"#.to_string());
 
     db.execute(
         "INSERT INTO vault (id, label, group_name, tags, host, port, username, auth_type, agent_forwarding, startup_command, proxy, theme_color, created_at, updated_at)
@@ -214,8 +214,8 @@ pub fn insert_entry(db: &rusqlite::Connection, entry: &VaultEntry) -> Result<(),
 /// Update an existing vault entry.
 pub fn update_entry(db: &rusqlite::Connection, entry: &VaultEntry) -> Result<(), String> {
     let tags_json = serde_json::to_string(&entry.tags).unwrap_or_else(|_| "[]".to_string());
-    let auth_json =
-        serde_json::to_string(&entry.auth_type).unwrap_or_else(|_| r#"{"type":"Password","data":{"password":""}}"#.to_string());
+    let auth_json = serde_json::to_string(&entry.auth_type)
+        .unwrap_or_else(|_| r#"{"type":"Password","data":{"password":""}}"#.to_string());
 
     let rows = db
         .execute(

@@ -88,9 +88,7 @@ impl WindowRegistry {
             .workspace_to_label
             .lock()
             .expect("window registry poisoned");
-        map.iter()
-            .map(|(k, v)| (k.clone(), v.clone()))
-            .collect()
+        map.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
     }
 
     /// Hitung jumlah entry.

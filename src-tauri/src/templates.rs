@@ -108,21 +108,46 @@ macro_rules! template {
 
 pub fn builtin_templates() -> Vec<WorkspaceTemplate> {
     vec![
-        template!(TemplateId::Blank, "Blank",
+        template!(
+            TemplateId::Blank,
+            "Blank",
             "One PowerShell pane, no startup commands.",
-            "#7c3aed", "1", BLANK_PANES),
-        template!(TemplateId::FrontendDev, "Frontend dev",
+            "#7c3aed",
+            "1",
+            BLANK_PANES
+        ),
+        template!(
+            TemplateId::FrontendDev,
+            "Frontend dev",
             "Dev server + tests, both inside the project root.",
-            "#0ea5e9", "2", FRONTEND_PANES),
-        template!(TemplateId::FullStack, "Full-stack",
+            "#0ea5e9",
+            "2",
+            FRONTEND_PANES
+        ),
+        template!(
+            TemplateId::FullStack,
+            "Full-stack",
             "Frontend, backend, and a tail/log pane for debugging.",
-            "#22c55e", "4", FULLSTACK_PANES),
-        template!(TemplateId::DevOps, "DevOps",
+            "#22c55e",
+            "4",
+            FULLSTACK_PANES
+        ),
+        template!(
+            TemplateId::DevOps,
+            "DevOps",
             "kubectl / docker / ssh shell side by side.",
-            "#f97316", "4", DEVOPS_PANES),
-        template!(TemplateId::DataScience, "Data science",
+            "#f97316",
+            "4",
+            DEVOPS_PANES
+        ),
+        template!(
+            TemplateId::DataScience,
+            "Data science",
             "Notebook + dataset + plotting pane.",
-            "#a855f7", "4", DATA_PANES),
+            "#a855f7",
+            "4",
+            DATA_PANES
+        ),
     ]
 }
 

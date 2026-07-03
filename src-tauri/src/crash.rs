@@ -415,10 +415,7 @@ mod tests {
         let counters = Arc::new(CrashCounters::new());
         let injector = CrashInjector::new(counters.clone());
         injector.enqueue(InjectionPlan::new(CrashScenario::SpawnEagain, 2));
-        injector.enqueue(InjectionPlan::new(
-            CrashScenario::BrokenPipeOnRead,
-            1,
-        ));
+        injector.enqueue(InjectionPlan::new(CrashScenario::BrokenPipeOnRead, 1));
 
         assert_eq!(injector.pick(), Some(CrashScenario::SpawnEagain));
         injector.consume();
@@ -457,9 +454,15 @@ mod tests {
         counters.spawn_failed.fetch_add(1, Ordering::Relaxed);
         counters.read_broken_pipe.fetch_add(2, Ordering::Relaxed);
         counters.panics_caught.fetch_add(1, Ordering::Relaxed);
-        counters.snapshot_write_failures.fetch_add(1, Ordering::Relaxed);
-        counters.sqlite_busy_wait_ms.fetch_add(250, Ordering::Relaxed);
-        counters.recovery_races_observed.fetch_add(2, Ordering::Relaxed);
+        counters
+            .snapshot_write_failures
+            .fetch_add(1, Ordering::Relaxed);
+        counters
+            .sqlite_busy_wait_ms
+            .fetch_add(250, Ordering::Relaxed);
+        counters
+            .recovery_races_observed
+            .fetch_add(2, Ordering::Relaxed);
         let summary = counters.summary();
         assert_eq!(summary.spawn_attempts, 5);
         assert_eq!(summary.spawn_succeeded, 4);

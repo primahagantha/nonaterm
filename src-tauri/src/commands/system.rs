@@ -12,7 +12,7 @@ use crate::perf::{
     measure_idle_with_sink, measure_multi_spawn, measure_throughput_with_sink,
     measure_throughput_with_tty_responding, noop_sink, MultiSpawnReport,
 };
-use crate::pty::{PTY_EXIT_EVENT, PTY_OUTPUT_EVENT, ShellSpec};
+use crate::pty::{ShellSpec, PTY_EXIT_EVENT, PTY_OUTPUT_EVENT};
 use crate::state::{AUTOSAVE_TRIGGERED_EVENT, WORKSPACE_CHANGED_EVENT};
 use crate::utils::diagnostics::DiagnosticsSummary;
 use crate::utils::normalize_label;
@@ -204,9 +204,7 @@ pub async fn system_install_update(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn system_run_perf_probe(
-    state: State<'_, AppState>,
-) -> Result<PerfProbeResult, String> {
+pub async fn system_run_perf_probe(state: State<'_, AppState>) -> Result<PerfProbeResult, String> {
     let total_started = Instant::now();
     let pane_id = format!("perf-probe-{}", uuid::Uuid::new_v4());
     let spec = ShellSpec::from_legacy(Some("powershell.exe".to_string()));
@@ -371,7 +369,9 @@ pub async fn system_run_crash_simulation(
     let total_count = scenarios.iter().map(|s| s.count as usize).sum::<usize>();
 
     for _ in 0..total_count {
-        let Some(scenario) = injector.pick() else { break };
+        let Some(scenario) = injector.pick() else {
+            break;
+        };
         consumed.push(scenario.label().to_string());
 
         match scenario {
@@ -389,23 +389,35 @@ pub async fn system_run_crash_simulation(
                 });
             }
             CrashScenario::BrokenPipeOnRead => {
-                counters.read_attempts.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                counters.read_broken_pipe.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .read_attempts
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .read_broken_pipe
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
             }
             CrashScenario::SpawnEagain => {
-                counters.spawn_attempts.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                counters.spawn_failed.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .spawn_attempts
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .spawn_failed
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
             }
             CrashScenario::ResizeInvalid => {
-                counters.resize_attempts.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                counters.resize_invalid.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .resize_attempts
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counters
+                    .resize_invalid
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
             }
             // -- State-level: route ke live StateManager. Fault
             //    injector di-install sebelum, di-clear setelah
             //    supaya tidak bocor.
             CrashScenario::SnapshotWriteIoError => {
-                if let Err(error) = state_manager
-                    .run_snapshot_write_io_error_scenario(&counters, &probe_snapshot)
+                if let Err(error) =
+                    state_manager.run_snapshot_write_io_error_scenario(&counters, &probe_snapshot)
                 {
                     tracing::warn!(error = %error, "snapshot-write-io-error scenario anomali");
                 }
@@ -419,8 +431,8 @@ pub async fn system_run_crash_simulation(
                 }
             }
             CrashScenario::RecoveryRace => {
-                if let Err(error) = state_manager
-                    .run_recovery_race_scenario(&counters, &probe_snapshot)
+                if let Err(error) =
+                    state_manager.run_recovery_race_scenario(&counters, &probe_snapshot)
                 {
                     tracing::warn!(error = %error, "recovery-race scenario anomali");
                 }
@@ -442,9 +454,7 @@ fn parse_scenario(label: &str) -> Result<CrashScenario, String> {
         "process-exits-immediately" | "exit" | "exit137" => {
             Ok(CrashScenario::ProcessExitsImmediately)
         }
-        "broken-pipe-on-read" | "broken-pipe" | "epipe" => {
-            Ok(CrashScenario::BrokenPipeOnRead)
-        }
+        "broken-pipe-on-read" | "broken-pipe" | "epipe" => Ok(CrashScenario::BrokenPipeOnRead),
         "spawn-eagain" | "eagain" | "spawn-fail" => Ok(CrashScenario::SpawnEagain),
         "panic-during-output" | "panic" => Ok(CrashScenario::PanicDuringOutput),
         "resize-invalid" | "einval" | "resize-fail" => Ok(CrashScenario::ResizeInvalid),

@@ -125,9 +125,7 @@ impl ShellSpec {
                         "powershell.exe" | "powershell" => Some("powershell"),
                         "pwsh.exe" | "pwsh" => Some("pwsh"),
                         "cmd.exe" | "cmd" => Some("cmd"),
-                        "bash" | "bash.exe" | "git-bash" | "gitbash" => {
-                            Some("gitbash")
-                        }
+                        "bash" | "bash.exe" | "git-bash" | "gitbash" => Some("gitbash"),
                         "wsl" | "wsl.exe" => Some("wsl"),
                         _ => None,
                     };

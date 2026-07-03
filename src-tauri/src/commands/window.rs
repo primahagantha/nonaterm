@@ -40,11 +40,7 @@ fn build_window_label(workspace_id: &str) -> String {
 
 /// Pasang handler `CloseRequested` ke window sehingga registry dibersihkan
 /// dan event `workspace:window-closed` di-emit ke semua frontend.
-pub fn attach_close_handler(
-    app: &AppHandle,
-    registry: WindowRegistry,
-    window_label: String,
-) {
+pub fn attach_close_handler(app: &AppHandle, registry: WindowRegistry, window_label: String) {
     if let Some(window) = app.get_webview_window(&window_label) {
         let app_handle = app.clone();
         window.on_window_event(move |event| {
@@ -124,9 +120,7 @@ pub async fn workspace_open_in_new_window(
         .build()
         .map_err(|error| format!("failed to create window: {error}"))?;
 
-    state
-        .window_registry
-        .register(&workspace_id, &label);
+    state.window_registry.register(&workspace_id, &label);
 
     // Pasang close handler dengan snapshot registry (supaya handler
     // tidak memegang reference ke State<'_> yang borrow temporary).
@@ -202,10 +196,7 @@ pub struct WindowPosition {
 
 /// Save current window position to a JSON file.
 #[tauri::command]
-pub fn window_save_position(
-    app: AppHandle,
-    window_label: String,
-) -> Result<(), String> {
+pub fn window_save_position(app: AppHandle, window_label: String) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(&window_label) {
         let pos = window.outer_position().map_err(|e| e.to_string())?;
         let size = window.outer_size().map_err(|e| e.to_string())?;
@@ -238,10 +229,7 @@ pub fn window_save_position(
 
 /// Restore window position from saved data.
 #[tauri::command]
-pub fn window_restore_position(
-    app: AppHandle,
-    window_label: String,
-) -> Result<bool, String> {
+pub fn window_restore_position(app: AppHandle, window_label: String) -> Result<bool, String> {
     let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
     let positions_file = app_data_dir.join("window-positions.json");
 
@@ -299,4 +287,3 @@ mod tests {
         assert_ne!(a, b);
     }
 }
-

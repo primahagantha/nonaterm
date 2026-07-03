@@ -78,9 +78,7 @@ pub fn keybind_clear_override(
 
 /// Hapus semua override. Return jumlah row yang dihapus.
 #[tauri::command]
-pub fn keybind_clear_all_overrides(
-    store: State<'_, KeybindStore>,
-) -> Result<usize, String> {
+pub fn keybind_clear_all_overrides(store: State<'_, KeybindStore>) -> Result<usize, String> {
     store.clear_all_overrides()
 }
 

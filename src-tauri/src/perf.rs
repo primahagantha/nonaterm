@@ -238,8 +238,7 @@ pub fn compare_to_baseline(
         .map(|(name, baseline, current, dir)| {
             let mut delta = MetricDelta::new(name, *baseline, *current, *dir);
             // Recompute with custom threshold.
-            delta.regressed =
-                dir.is_regression(*baseline, *current, threshold_pct);
+            delta.regressed = dir.is_regression(*baseline, *current, threshold_pct);
             delta
         })
         .collect();
@@ -260,21 +259,14 @@ pub fn format_baseline_report(comparison: &BaselineComparison) -> String {
     let status = if comparison.passed { "PASS" } else { "FAIL" };
     out.push_str(&format!(
         "[perf-baseline] {} (threshold ±{}%, regressed: {})\n",
-        status,
-        comparison.threshold_pct,
-        comparison.regressed_count
+        status, comparison.threshold_pct, comparison.regressed_count
     ));
     for d in &comparison.deltas {
         let marker = if d.regressed { "REGRESSION" } else { "ok" };
         let sign = if d.delta_pct >= 0.0 { "+" } else { "" };
         out.push_str(&format!(
             "  - {:<26} baseline={:>10.2}  current={:>10.2}  Δ={}{:>6.2}%  [{}]\n",
-            d.name,
-            d.baseline,
-            d.current,
-            sign,
-            d.delta_pct,
-            marker,
+            d.name, d.baseline, d.current, sign, d.delta_pct, marker,
         ));
     }
     out
@@ -316,11 +308,17 @@ impl CountingPtyEventSink {
     }
 
     pub fn total_bytes(&self) -> u64 {
-        self.state.lock().expect("counting sink poisoned").total_bytes
+        self.state
+            .lock()
+            .expect("counting sink poisoned")
+            .total_bytes
     }
 
     pub fn total_batches(&self) -> u64 {
-        self.state.lock().expect("counting sink poisoned").total_batches
+        self.state
+            .lock()
+            .expect("counting sink poisoned")
+            .total_batches
     }
 
     pub fn per_pane(&self) -> Vec<PaneOutputCounters> {
@@ -644,9 +642,7 @@ pub async fn measure_idle_with_sink(
     }
 
     // Sample RSS: first snapshot right after spawn, then every interval.
-    let mut samples: Vec<u64> = resident_memory_bytes()
-        .into_iter()
-        .collect();
+    let mut samples: Vec<u64> = resident_memory_bytes().into_iter().collect();
     let started = Instant::now();
     let interval = Duration::from_millis(sample_interval_ms.max(50));
     let dwell = Duration::from_millis(dwell_ms);
@@ -969,9 +965,7 @@ fn windows_rss() -> Option<u64> {
 
     let mut counters: PROCESS_MEMORY_COUNTERS = unsafe { zeroed() };
     let cb = size_of::<PROCESS_MEMORY_COUNTERS>() as u32;
-    let success = unsafe {
-        K32GetProcessMemoryInfo(GetCurrentProcess(), &mut counters, cb)
-    };
+    let success = unsafe { K32GetProcessMemoryInfo(GetCurrentProcess(), &mut counters, cb) };
     if success == 0 {
         return None;
     }
@@ -1022,24 +1016,14 @@ mod tests {
 
     #[test]
     fn metric_delta_lower_is_better_detects_regression() {
-        let delta = MetricDelta::new(
-            "spawn_ms",
-            100.0,
-            130.0,
-            MetricDirection::LowerIsBetter,
-        );
+        let delta = MetricDelta::new("spawn_ms", 100.0, 130.0, MetricDirection::LowerIsBetter);
         assert!(delta.regressed, "30% increase should be flagged");
         assert!((delta.delta_pct - 30.0).abs() < 0.01);
     }
 
     #[test]
     fn metric_delta_lower_is_better_passes_within_threshold() {
-        let delta = MetricDelta::new(
-            "spawn_ms",
-            100.0,
-            105.0,
-            MetricDirection::LowerIsBetter,
-        );
+        let delta = MetricDelta::new("spawn_ms", 100.0, 105.0, MetricDirection::LowerIsBetter);
         assert!(!delta.regressed, "5% increase should pass");
     }
 
@@ -1069,12 +1053,7 @@ mod tests {
     #[test]
     fn metric_delta_handles_zero_baseline() {
         // Avoid divide-by-zero; zero baseline should not regress.
-        let delta = MetricDelta::new(
-            "spawn_ms",
-            0.0,
-            50.0,
-            MetricDirection::LowerIsBetter,
-        );
+        let delta = MetricDelta::new("spawn_ms", 0.0, 50.0, MetricDirection::LowerIsBetter);
         assert!(!delta.regressed);
         assert_eq!(delta.delta_pct, 0.0);
     }
@@ -1082,9 +1061,19 @@ mod tests {
     #[test]
     fn compare_to_baseline_passes_when_all_within_threshold() {
         let pairs = vec![
-            ("spawn_total_ms", 1800.0, 1900.0, MetricDirection::LowerIsBetter),
+            (
+                "spawn_total_ms",
+                1800.0,
+                1900.0,
+                MetricDirection::LowerIsBetter,
+            ),
             ("rss_idle_max", 150.0, 155.0, MetricDirection::LowerIsBetter),
-            ("throughput_kbps", 100.0, 110.0, MetricDirection::HigherIsBetter),
+            (
+                "throughput_kbps",
+                100.0,
+                110.0,
+                MetricDirection::HigherIsBetter,
+            ),
         ];
         let result = compare_to_baseline(&pairs, 10.0);
         assert!(result.passed);
@@ -1095,7 +1084,12 @@ mod tests {
     #[test]
     fn compare_to_baseline_fails_on_regression() {
         let pairs = vec![
-            ("spawn_total_ms", 1800.0, 2100.0, MetricDirection::LowerIsBetter),
+            (
+                "spawn_total_ms",
+                1800.0,
+                2100.0,
+                MetricDirection::LowerIsBetter,
+            ),
             ("rss_idle_max", 150.0, 160.0, MetricDirection::LowerIsBetter),
         ];
         let result = compare_to_baseline(&pairs, 10.0);
@@ -1120,7 +1114,12 @@ mod tests {
     #[test]
     fn format_baseline_report_marks_regressions() {
         let pairs = vec![
-            ("spawn_total_ms", 1800.0, 2100.0, MetricDirection::LowerIsBetter),
+            (
+                "spawn_total_ms",
+                1800.0,
+                2100.0,
+                MetricDirection::LowerIsBetter,
+            ),
             ("rss_idle_max", 150.0, 155.0, MetricDirection::LowerIsBetter),
         ];
         let result = compare_to_baseline(&pairs, 10.0);
@@ -1203,8 +1202,8 @@ mod tests {
 
     // ---- TtyRespondingSink tests ----
 
-    use std::sync::Mutex;
     use crate::pty::{PtyExitEventPayload, PtyOutputEventPayload};
+    use std::sync::Mutex;
 
     /// Test sink yang merekam semua payload yang lewat untuk verifikasi
     /// forwarding. Counter accessed via Mutex (test-only).

@@ -453,9 +453,7 @@ impl StateManager {
         if let Some(injector) = &injector_snapshot {
             if injector.should_fail_snapshot_write() {
                 injector.record_snapshot_write(false);
-                tracing::warn!(
-                    "StateFaultInjector.fail_snapshot_write aktif — write dibatalkan"
-                );
+                tracing::warn!("StateFaultInjector.fail_snapshot_write aktif — write dibatalkan");
                 return Err(
                     "simulated I/O error: snapshot write dibatalkan oleh fault injector"
                         .to_string(),
@@ -520,8 +518,7 @@ impl StateManager {
                 Ok(())
             }
             Ok(()) => Err(
-                "fault aktif tapi save_to_db_then_json sukses — injector tidak konsult"
-                    .to_string(),
+                "fault aktif tapi save_to_db_then_json sukses — injector tidak konsult".to_string(),
             ),
         }
     }
@@ -562,16 +559,14 @@ impl StateManager {
 
         // Manager connection — busy_timeout bikin INSERT menunggu.
         let started = std::time::Instant::now();
-        let insert_result = self
-            .open_db()
-            .and_then(|conn| {
-                conn.execute(
-                    "INSERT INTO app_state (key, value) VALUES ('crash_probe_writer', ?1) \
+        let insert_result = self.open_db().and_then(|conn| {
+            conn.execute(
+                "INSERT INTO app_state (key, value) VALUES ('crash_probe_writer', ?1) \
                      ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                    params!["busy"],
-                )
-                .map_err(|e| e.to_string())
-            });
+                params!["busy"],
+            )
+            .map_err(|e| e.to_string())
+        });
         let elapsed_ms = started.elapsed().as_millis() as u64;
         let _ = release_handle.join().expect("release thread join");
         let _ = release_at; // suppress unused if build flags strip
@@ -836,8 +831,8 @@ mod tests {
 
     // -- Crash simulation: state-level scenarios ---------------------------
 
-    use std::sync::atomic::Ordering;
     use crate::crash::{CrashCounters, StateFaultInjector};
+    use std::sync::atomic::Ordering;
 
     fn tmp_manager_with_injector() -> (StateManager, std::sync::Arc<CrashCounters>) {
         let dir = std::env::temp_dir().join(format!("Nonaterm-test-{}", Uuid::new_v4()));
@@ -891,11 +886,7 @@ mod tests {
         assert!(manager.save_to_db_then_json(&snapshot).is_err());
 
         // Reset, write must succeed.
-        manager
-            .fault_injector()
-            .as_ref()
-            .expect("injector")
-            .reset();
+        manager.fault_injector().as_ref().expect("injector").reset();
         // Second call with same snapshot — write_json_snapshot should
         // pass the fault gate (flag off) and complete.
         let result = manager.write_json_snapshot_only(&snapshot);
@@ -989,9 +980,7 @@ mod tests {
             .expect("injector")
             .enable(CrashScenario::RecoveryRace);
         // Reset baseline agar counter clean.
-        counters
-            .recovery_races_observed
-            .store(0, Ordering::Relaxed);
+        counters.recovery_races_observed.store(0, Ordering::Relaxed);
 
         let snapshot = StateSnapshot {
             active_workspace_id: "ws-race".into(),
@@ -1040,9 +1029,7 @@ mod tests {
         // triggers write, verifies counter + ensures no file.
         let (manager, counters) = tmp_manager_with_injector();
         manager.clear_fault_injector();
-        counters
-            .snapshot_write_failures
-            .store(0, Ordering::Relaxed);
+        counters.snapshot_write_failures.store(0, Ordering::Relaxed);
 
         let snapshot = StateSnapshot {
             active_workspace_id: "ws-helper".into(),
@@ -1072,10 +1059,7 @@ mod tests {
         counters.sqlite_busy_retries.store(0, Ordering::Relaxed);
 
         manager
-            .run_sqlite_busy_timeout_scenario(
-                &counters,
-                std::time::Duration::from_millis(200),
-            )
+            .run_sqlite_busy_timeout_scenario(&counters, std::time::Duration::from_millis(200))
             .expect("busy_timeout scenario harus sukses setelah holder release");
 
         let wait_ms = counters.sqlite_busy_wait_ms.load(Ordering::Relaxed);

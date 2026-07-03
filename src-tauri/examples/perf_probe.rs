@@ -19,11 +19,11 @@ use std::env;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use serde::Serialize;
 use nonaterm_lib::perf::{
-    compare_to_baseline, format_baseline_report, measure_idle_with_sink, measure_throughput_with_sink,
-    noop_sink, MetricDirection,
+    compare_to_baseline, format_baseline_report, measure_idle_with_sink,
+    measure_throughput_with_sink, noop_sink, MetricDirection,
 };
+use serde::Serialize;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -259,13 +259,17 @@ async fn main() -> Result<(), String> {
             ),
             (
                 "multi_spawn.avg_spawn_ms",
-                baseline_json["multiSpawn"]["avgSpawnMs"].as_f64().unwrap_or(0.0),
+                baseline_json["multiSpawn"]["avgSpawnMs"]
+                    .as_f64()
+                    .unwrap_or(0.0),
                 m.avg_spawn_ms as f64,
                 MetricDirection::LowerIsBetter,
             ),
             (
                 "multi_spawn.p95_spawn_ms",
-                baseline_json["multiSpawn"]["p95SpawnMs"].as_f64().unwrap_or(0.0),
+                baseline_json["multiSpawn"]["p95SpawnMs"]
+                    .as_f64()
+                    .unwrap_or(0.0),
                 m.p95_spawn_ms as f64,
                 MetricDirection::LowerIsBetter,
             ),
@@ -285,7 +289,9 @@ async fn main() -> Result<(), String> {
             ),
             (
                 "idle.rss_delta_bytes",
-                baseline_json["idle"]["rssDeltaBytes"].as_f64().unwrap_or(0.0),
+                baseline_json["idle"]["rssDeltaBytes"]
+                    .as_f64()
+                    .unwrap_or(0.0),
                 i.rss_delta_bytes as f64,
                 MetricDirection::LowerIsBetter,
             ),

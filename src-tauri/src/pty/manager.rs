@@ -15,8 +15,7 @@ use super::reader::spawn_reader_thread;
 use super::session::PtySession;
 use super::shell_resolver::{ShellResolution, ShellResolver};
 use super::{
-    PtyConfig, PtyEventSink, PtyExitEventPayload, PtySessionSnapshot, ShellSpec,
-    TauriPtyEventSink,
+    PtyConfig, PtyEventSink, PtyExitEventPayload, PtySessionSnapshot, ShellSpec, TauriPtyEventSink,
 };
 
 pub struct PtyManager {

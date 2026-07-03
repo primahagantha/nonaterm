@@ -5,7 +5,6 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { FolderPicker } from './FolderPicker';
 import { ColorPicker } from './ColorPicker';
 import { SHELL_PRESETS, TOOL_PRESETS, type ShellPresetId } from './toolPresets';
-import { useSettingsStore } from '@/stores/settingsStore';
 
 type TerminalConfigModalProps = {
   onAddPane?: (shell: string, cwd: string) => void;

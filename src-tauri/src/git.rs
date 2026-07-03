@@ -83,8 +83,8 @@ fn find_repo_root(start: &Path) -> Option<PathBuf> {
 
 pub fn detect_repo(folder: &str) -> Result<RepoInfo, String> {
     let folder_path = Path::new(folder);
-    let root = find_repo_root(folder_path)
-        .ok_or_else(|| format!("not a git repository: {folder}"))?;
+    let root =
+        find_repo_root(folder_path).ok_or_else(|| format!("not a git repository: {folder}"))?;
     let root_str = root.to_string_lossy().to_string();
 
     let current_branch = git_cwd(&root, &["rev-parse", "--abbrev-ref", "HEAD"])
@@ -108,13 +108,25 @@ pub fn detect_repo(folder: &str) -> Result<RepoInfo, String> {
 fn list_worktrees_internal(repo: &Path) -> Result<Vec<WorktreeInfo>, String> {
     let raw = git_cwd(
         repo,
-        &["worktree", "list", "--porcelain", "-z", "--format=%(refname:short)|%(objectname:short)|%(path)|%(isworktree)"],
+        &[
+            "worktree",
+            "list",
+            "--porcelain",
+            "-z",
+            "--format=%(refname:short)|%(objectname:short)|%(path)|%(isworktree)",
+        ],
     )?;
     let mut out: Vec<WorktreeInfo> = Vec::new();
     for line in raw.split('\u{0}').filter(|s| !s.is_empty()) {
         let mut parts = line.splitn(4, '|');
-        let branch = parts.next().map(|s| s.to_string()).filter(|s| !s.is_empty());
-        let head_sha = parts.next().map(|s| s.to_string()).filter(|s| !s.is_empty());
+        let branch = parts
+            .next()
+            .map(|s| s.to_string())
+            .filter(|s| !s.is_empty());
+        let head_sha = parts
+            .next()
+            .map(|s| s.to_string())
+            .filter(|s| !s.is_empty());
         let path = parts.next().map(|s| s.to_string()).unwrap_or_default();
         let is_main_str = parts.next().unwrap_or("false");
         let is_main = is_main_str == "true" || branch.as_deref() == Some("(bare)");
@@ -138,7 +150,10 @@ pub fn list_worktrees(repo: &str) -> Result<Vec<WorktreeInfo>, String> {
 
 pub fn list_branches(repo: &str) -> Result<Vec<String>, String> {
     let root = Path::new(repo);
-    let raw = git_cwd(root, &["for-each-ref", "--format=%(refname:short)", "refs/heads/"])?;
+    let raw = git_cwd(
+        root,
+        &["for-each-ref", "--format=%(refname:short)", "refs/heads/"],
+    )?;
     Ok(raw
         .split('\n')
         .map(|s| s.trim().to_string())
