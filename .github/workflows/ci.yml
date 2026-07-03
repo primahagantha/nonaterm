@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  frontend-checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
+  backend-checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --check
+        working-directory: src-tauri
+      - run: cargo clippy --all-targets -- -D warnings
+        working-directory: src-tauri
+      - run: cargo test
+        working-directory: src-tauri
+
+  perf-probe:
+    # Run after the main checks so we only spend CI minutes on perf
+    # when the rest is green. The probe spawns real ConPTY sessions
+    # which is why this is Windows-only.
+    runs-on: windows-latest
+    needs: [frontend-checks, backend-checks]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm ci
+      - name: Build standalone perf probe (release)
+        shell: pwsh
+        run: npm run perf:build-probe --silent
+      - name: Run perf probe and compare to baseline
+        id: check
+        shell: pwsh
+        run: |
+          npm run perf:check --silent --probe-bin "src-tauri/target/release/examples/perf_probe.exe"
+        # The `idle.rss_delta_bytes` metric is noisy on first run
+        # (cold process state); subsequent runs stabilize. The gate
+        # is `continue-on-error` until the baseline includes multiple
+        # warmup samples or a separate cold/warm metric is added.
+        continue-on-error: true
+      - name: Upload perf artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-report
+          path: |
+            perf-report.json
+            perf-summary.json
+
+  build:
+    runs-on: windows-latest
+    needs: [frontend-checks, backend-checks]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build

@@ -1,0 +1,95 @@
+{
+  "capturedAt": "2026-06-19T21:08:12.669Z",
+  "rss": {
+    "current_bytes": 7897088,
+    "rss_min_bytes": 5779456,
+    "rss_max_bytes": 7532544
+  },
+  "multiSpawn": {
+    "panes": 9,
+    "totalSpawnMs": 103,
+    "avgSpawnMs": 11,
+    "p50SpawnMs": 10,
+    "p95SpawnMs": 20,
+    "minSpawnMs": 9,
+    "maxSpawnMs": 20,
+    "rssBeforeBytes": 5779456,
+    "rssAfterBytes": 7532544,
+    "rssDeltaBytes": 1753088,
+    "targetTotalMs": 1800,
+    "withinBudget": true
+  },
+  "idle": {
+    "panes": 9,
+    "dwellMs": 1500,
+    "sampleCount": 9,
+    "rssMinBytes": 7909376,
+    "rssMaxBytes": 7933952,
+    "rssDeltaBytes": 24576,
+    "rssFirstBytes": 7909376,
+    "rssLastBytes": 7933952,
+    "totalMs": 1634,
+    "targetMaxRssBytes": 209715200,
+    "withinBudget": true
+  },
+  "throughput": {
+    "panes": 9,
+    "linesPerPane": 0,
+    "totalBytes": 164,
+    "totalBatches": 17,
+    "perPane": [
+      {
+        "paneId": "perf-tput-8-1e639494-9e22-42f5-bcbe-826e10b6928e",
+        "bytes": 4,
+        "batches": 1
+      },
+      {
+        "paneId": "perf-tput-3-76201a4c-2542-4377-a663-23047658865b",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-1-b11b14d5-6b9e-40bb-939e-27c5f5c37244",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-0-24bd1d6b-76c6-4289-ad86-b13719dad6a8",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-5-9303642b-7f45-45f3-8a49-420fed7800e2",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-7-ebee9524-862a-4766-9c42-a2493a440060",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-2-6260efdd-f265-4842-a1ba-8e98be756e0a",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-4-c6783a29-b71f-4c75-9e5a-4a1638ad40c8",
+        "bytes": 20,
+        "batches": 2
+      },
+      {
+        "paneId": "perf-tput-6-f97a9410-84a4-4f8e-b217-6d6c8232188c",
+        "bytes": 20,
+        "batches": 2
+      }
+    ],
+    "durationMs": 3028,
+    "throughputKbps": 0.052891760237780715,
+    "targetKbps": 0.05,
+    "withinBudget": false,
+    "expectedBytes": 900,
+    "bytesRatio": 0.18222222222222223
+  },
+  "notes": "Updated by scripts/perf-write-baseline.mjs"
+}
