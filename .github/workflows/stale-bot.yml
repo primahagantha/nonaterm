@@ -8,7 +8,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           stale-issue-message: This issue has been marked stale after 30 days of inactivity.
           stale-pr-message: This PR has been marked stale after 30 days of inactivity.
