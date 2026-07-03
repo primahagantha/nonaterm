@@ -75,6 +75,7 @@ impl VaultEntry {
 }
 
 /// Initialize the vault table in SQLite.
+#[allow(dead_code)]
 pub fn init_vault_table(db: &rusqlite::Connection) -> Result<(), String> {
     db.execute(
         "CREATE TABLE IF NOT EXISTS vault (
@@ -265,7 +266,7 @@ pub fn list_groups(db: &rusqlite::Connection) -> Result<Vec<String>, String> {
         .map_err(|e| format!("Failed to prepare query: {}", e))?;
 
     let groups = stmt
-        .query_map([], |row| Ok(row.get::<_, String>(0)?))
+        .query_map([], |row| row.get(0))
         .map_err(|e| format!("Failed to query groups: {}", e))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| format!("Failed to collect groups: {}", e))?;

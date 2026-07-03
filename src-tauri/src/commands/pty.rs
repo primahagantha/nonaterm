@@ -22,6 +22,7 @@ pub struct PtySessionInfo {
 
 /// Membuat PTY session baru untuk pane tertentu.
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
 pub async fn pty_spawn(
     state: State<'_, AppState>,
     workspace_id: String,

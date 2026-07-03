@@ -49,6 +49,7 @@ impl PtyManager {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn spawn_session(
         &self,
         workspace_id: String,
@@ -71,6 +72,7 @@ impl PtyManager {
         .await
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn spawn_session_with_spec(
         &self,
         workspace_id: String,

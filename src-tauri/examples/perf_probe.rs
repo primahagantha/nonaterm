@@ -72,6 +72,7 @@ async fn run_probes(panes: usize, dwell_ms: u64, lines: u32) -> Result<PerfRepor
                 pane_id.clone(),
                 spec.clone(),
                 None,
+                None,
                 Some(24),
                 Some(80),
             )
