@@ -12,7 +12,7 @@
 
 ```bash
 # Clone
-git clone https://github.com/primahagantha/nonaterm.git
+git clone https://github.com/primahagantha/nonaterm-app.git
 cd nonaterm
 
 # Install dependencies
