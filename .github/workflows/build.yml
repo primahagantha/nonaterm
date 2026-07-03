@@ -110,18 +110,9 @@ jobs:
   # Build macOS (Intel + Apple Silicon)
   # ──────────────────────────────────────────────
   build-macos:
-    name: Build macOS (${{ matrix.arch }})
-    runs-on: ${{ matrix.runner }}
+    name: Build macOS
+    runs-on: macos-latest
     needs: test
-    strategy:
-      matrix:
-        include:
-          - arch: x64
-            runner: macos-latest
-            target: x86_64-apple-darwin
-          - arch: aarch64
-            runner: macos-latest
-            target: aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v4
 
@@ -143,19 +134,19 @@ jobs:
       - run: npm ci
 
       - name: Build
-        run: npx @tauri-apps/cli build --target ${{ matrix.target }}
+        run: npx @tauri-apps/cli build
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: nonaterm-macos-${{ matrix.arch }}
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+          name: nonaterm-macos
+          path: src-tauri/target/release/bundle/dmg/*.dmg
 
       - name: Upload App
         uses: actions/upload-artifact@v4
         with:
-          name: nonaterm-macos-${{ matrix.arch }}-app
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app
+          name: nonaterm-macos-app
+          path: src-tauri/target/release/bundle/macos/*.app
 
   # ──────────────────────────────────────────────
   # Build Linux (Debian/Ubuntu + AppImage)

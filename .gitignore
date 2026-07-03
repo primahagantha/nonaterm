@@ -1,20 +1,20 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
-# Build
+# Build output
 dist/
 dist-ssr/
 *.local
 
-# Tauri
+# Tauri build
 src-tauri/target/
 
-# Keys & Secrets (NEVER commit)
+# Keys & Secrets — NEVER commit these
 keys/
 *.key
 *.pem
+*.p12
+*.jks
 *.env
 .env
 .env.local
@@ -34,15 +34,19 @@ desktop.ini
 
 # Logs
 *.log
+npm-debug.log*
 logs/
 
-# Test
+# Test & Coverage
 coverage/
+test-results/
+playwright-report/
 
-# Claude
+# Claude / AI
 .claude/
 .agents/
 
-# Misc docs that don't need to be in repo
-CONTRIBUTING.md
-CHANGELOG.md
+# Misc
+*.tgz
+*.tar.gz
+.cache/
