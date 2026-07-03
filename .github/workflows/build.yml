@@ -60,7 +60,7 @@ jobs:
       - name: E2E Tests
         run: npx playwright test --reporter=list
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -95,13 +95,13 @@ jobs:
         run: npx @tauri-apps/cli build
 
       - name: Upload MSI
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-windows-msi
           path: src-tauri/target/release/bundle/msi/*.msi
 
       - name: Upload EXE Setup
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-windows-exe
           path: src-tauri/target/release/bundle/nsis/*.exe
@@ -146,13 +146,13 @@ jobs:
         run: npx @tauri-apps/cli build --target ${{ matrix.target }}
 
       - name: Upload DMG
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-macos-${{ matrix.arch }}
           path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
 
       - name: Upload App
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-macos-${{ matrix.arch }}-app
           path: src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app
@@ -196,19 +196,19 @@ jobs:
         run: npx @tauri-apps/cli build
 
       - name: Upload Debian Package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-linux-deb
           path: src-tauri/target/release/bundle/deb/*.deb
 
       - name: Upload AppImage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-linux-appimage
           path: src-tauri/target/release/bundle/appimage/*.AppImage
 
       - name: Upload RPM
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nonaterm-linux-rpm
           path: src-tauri/target/release/bundle/rpm/*.rpm
