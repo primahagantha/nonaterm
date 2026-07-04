@@ -1,11 +1,25 @@
 import os from 'os';
 import path from 'path';
+import fs from 'fs';
 import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const rootDir = path.resolve(__dirname, '..');
 let tauriDriver;
 let exit = false;
+
+// Find msedgedriver in common locations
+function findEdgeDriver() {
+  const candidates = [
+    path.join(rootDir, 'msedgedriver.exe'),
+    path.join(os.homedir(), '.cargo', 'bin', 'msedgedriver.exe'),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return 'msedgedriver';
+}
 
 export const config = {
   host: '127.0.0.1',
@@ -16,7 +30,7 @@ export const config = {
     {
       maxInstances: 1,
       'tauri:options': {
-        application: path.resolve(__dirname, '..', 'src-tauri', 'target', 'debug', 'nonaterm'),
+        application: path.resolve(rootDir, 'src-tauri', 'target', 'debug', 'nonaterm'),
       },
     },
   ],
@@ -31,18 +45,19 @@ export const config = {
   onPrepare: () => {
     console.log('[wdio] Building Tauri app (debug)...');
     spawnSync('npm', ['run', 'tauri', 'build', '--', '--debug', '--no-bundle'], {
-      cwd: path.resolve(__dirname, '..'),
+      cwd: rootDir,
       stdio: 'inherit',
       shell: true,
     });
   },
 
   // Start tauri-driver before session
-  beforeSession: () => {
-    console.log('[wdio] Starting tauri-driver...');
+  beforeSession: async () => {
+    const nativeDriver = findEdgeDriver();
+    console.log(`[wdio] Starting tauri-driver (native: ${nativeDriver})...`);
     tauriDriver = spawn(
       path.resolve(os.homedir(), '.cargo', 'bin', 'tauri-driver'),
-      [],
+      ['--native-driver', nativeDriver],
       { stdio: [null, process.stdout, process.stderr] },
     );
 
@@ -56,6 +71,10 @@ export const config = {
         process.exit(1);
       }
     });
+
+    // Wait for tauri-driver to be ready
+    console.log('[wdio] Waiting for tauri-driver...');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   },
 
   // Clean up tauri-driver after session
