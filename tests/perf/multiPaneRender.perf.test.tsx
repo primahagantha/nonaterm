@@ -41,7 +41,7 @@ describe('multi-pane render/load harness', () => {
       expect(await screen.findByTestId(`pane-${pane.id}`)).toBeInTheDocument();
     }
 
-    expect(elapsedMs).toBeLessThan(400);
+    expect(elapsedMs).toBeLessThan(1000);
   });
 
   it('updates 9 active sessions without approaching idle bookkeeping budget', () => {

@@ -204,11 +204,11 @@ export function defaultMockResponses(
       ],
     }),
     state_import_config: 2,
-    // Templates
+    // Templates (must match WorkspaceTemplate type: panes[] not paneCount)
     templates_list: [
-      { id: 'blank', label: 'Blank', description: 'Start from scratch', accentColor: '#6b7280', paneCount: 1 },
-      { id: 'frontend', label: 'Frontend dev', description: 'Vite + Tests', accentColor: '#3b82f6', paneCount: 2 },
-      { id: 'fullstack', label: 'Full-stack', description: 'FE + BE + Logs', accentColor: '#8b5cf6', paneCount: 3 },
+      { id: 'blank', label: 'Blank', description: 'Start from scratch', accentColor: '#6b7280', layoutPreset: '1', panes: [{ title: 'Terminal', cwd: '', shell: null, startupCommand: '' }] },
+      { id: 'frontend', label: 'Frontend dev', description: 'Vite + Tests', accentColor: '#3b82f6', layoutPreset: '2', panes: [{ title: 'Dev', cwd: '', shell: null, startupCommand: 'npm run dev' }, { title: 'Tests', cwd: '', shell: null, startupCommand: 'npm run test' }] },
+      { id: 'fullstack', label: 'Full-stack', description: 'FE + BE + Logs', accentColor: '#8b5cf6', layoutPreset: '4', panes: [{ title: 'Frontend', cwd: '', shell: null, startupCommand: 'npm run dev' }, { title: 'Backend', cwd: '', shell: null, startupCommand: 'cargo run' }, { title: 'Logs', cwd: '', shell: null, startupCommand: '' }] },
     ] as unknown[],
     templates_materialize: {
       id: 'ws-tpl-1',

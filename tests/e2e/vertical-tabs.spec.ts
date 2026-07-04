@@ -10,18 +10,19 @@ test.describe('Vertical Tabs', () => {
     const toggle = page.getByLabel('Toggle view mode');
     await expect(toggle).toBeVisible({ timeout: 5000 });
 
+    // Default is grid mode — terminal grid should be visible
+    await expect(page.locator('.terminal-grid').first()).toBeVisible();
+
     // Click to switch to vertical tabs
     await toggle.click();
 
     // Vertical tabs should be visible
-    const verticalTabs = page.locator('.vertical-tabs');
-    await expect(verticalTabs).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('.vertical-tabs').first()).toBeVisible({ timeout: 3000 });
 
     // Click again to switch back to grid
     await toggle.click();
 
     // Grid should be visible again
-    const grid = page.locator('.terminal-grid');
-    await expect(grid).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('.terminal-grid').first()).toBeVisible({ timeout: 3000 });
   });
 });

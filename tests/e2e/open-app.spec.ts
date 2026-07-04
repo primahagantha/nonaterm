@@ -9,8 +9,8 @@ test.describe('Open App Button', () => {
     // Wait for terminal pane to render
     await expect(page.locator('.terminal-pane').first()).toBeVisible();
 
-    // Open app button should be visible
-    await expect(page.getByRole('button', { name: /open app/i }).first()).toBeVisible();
+    // Open app button should be visible (quick launch button in pane header)
+    await expect(page.getByRole('button', { name: /quick launch/i }).first()).toBeVisible();
   });
 
   test('clicking open app opens quick launch modal', async ({ page }) => {
@@ -19,8 +19,8 @@ test.describe('Open App Button', () => {
 
     await expect(page.locator('.terminal-pane').first()).toBeVisible();
 
-    // Click open app button
-    await page.getByRole('button', { name: /open app/i }).first().click();
+    // Click quick launch button in pane header
+    await page.getByRole('button', { name: /quick launch/i }).first().click();
 
     // Quick launch modal should open
     await expect(page.getByRole('dialog', { name: /quick launch/i })).toBeVisible();

@@ -20,7 +20,7 @@ test.describe('Command Palette', () => {
     await expect(input).toBeVisible();
 
     // Should list workspace switch commands
-    await expect(page.getByText(/Switch to/)).toBeVisible();
+    await expect(page.getByText(/Switch to/).first()).toBeVisible();
   });
 
   test('closes on Escape', async ({ page }) => {

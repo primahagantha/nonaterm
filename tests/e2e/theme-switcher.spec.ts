@@ -9,10 +9,10 @@ test.describe('Theme Switcher', () => {
     await page.getByRole('button', { name: /open options menu/i }).click();
     await page.getByRole('tab', { name: /appearance/i }).click();
 
-    // Should show theme cards
+    // Should show theme cards (14 built-in themes)
     const themeCards = page.locator('.theme-card');
     await expect(themeCards.first()).toBeVisible();
-    await expect(themeCards).toHaveCount(6);
+    await expect(themeCards).toHaveCount(14);
   });
 
   test('clicking a theme card applies the theme', async ({ page }) => {
