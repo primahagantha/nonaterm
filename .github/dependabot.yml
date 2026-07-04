@@ -1,3 +1,18 @@
 # Dependabot disabled — dependencies managed manually
 version: 2
-updates: []
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "yearly"
+    open-pull-requests-limit: 0
+  - package-ecosystem: "cargo"
+    directory: "/src-tauri"
+    schedule:
+      interval: "yearly"
+    open-pull-requests-limit: 0
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "yearly"
+    open-pull-requests-limit: 0
