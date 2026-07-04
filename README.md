@@ -81,30 +81,25 @@ Scattered terminal windows are dead. Nonaterm gives you **named workspaces** wit
 ```powershell
 # PowerShell (recommended)
 irm https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.ps1 | iex
-
-# Or download from GitHub Releases
-# MSI: https://github.com/RegenadeJester/nonaterm/releases/latest/download/Nonaterm.msi
-# EXE: https://github.com/RegenadeJester/nonaterm/releases/latest/download/Nonaterm-setup.exe
 ```
+
+Or download directly from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/releases/latest) — MSI or EXE installer available.
 
 ### macOS
 
 ```bash
-# Intel
-curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash -s -- --arch x64
-
-# Apple Silicon (M1/M2/M3)
-curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash -s -- --arch aarch64
+curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
+
+Downloads DMG and installs to `/Applications`. Works on both Intel and Apple Silicon.
 
 ### Linux
 
 ```bash
-# Debian/Ubuntu
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
-
-# Or download .deb / .rpm / .AppImage from Releases
 ```
+
+Offers `.deb` (Debian/Ubuntu) or AppImage (universal). Or download `.deb` / `.rpm` / `.AppImage` from [Releases](https://github.com/RegenadeJester/nonaterm/releases/latest).
 
 ### Manual Download
 
