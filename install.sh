@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 # Nonaterm Installer for Linux/macOS
-# Usage: curl -fsSL https://raw.githubusercontent.com/regenadejester/nonaterm/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 
 set -euo pipefail
 
-REPO="regenadejester/nonaterm"  # Update this with actual GitHub repo
+REPO="RegenadeJester/nonaterm"
 VERSION="${NONATERM_VERSION:-latest}"
-INSTALL_DIR="${NONATERM_INSTALL_DIR:-$HOME/.local/bin}"
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -20,142 +18,147 @@ success() { echo -e "${GREEN}[nonaterm]${NC} $1"; }
 warn() { echo -e "${YELLOW}[nonaterm]${NC} $1"; }
 error() { echo -e "${RED}[nonaterm]${NC} $1" >&2; exit 1; }
 
-# Detect platform
-detect_platform() {
-  local os arch
+detect_os() {
+  local os
   os="$(uname -s)"
-  arch="$(uname -m)"
-
   case "$os" in
-    Linux*)   os="linux" ;;
-    Darwin*)  os="macos" ;;
-    *)        error "Unsupported OS: $os. Use Windows installer for Windows." ;;
+    Linux*)   echo "linux" ;;
+    Darwin*)  echo "macos" ;;
+    *)        error "Unsupported OS: $os. Use the PowerShell installer for Windows." ;;
   esac
-
-  case "$arch" in
-    x86_64|amd64)  arch="x64" ;;
-    aarch64|arm64) arch="aarch64" ;;
-    *)             error "Unsupported architecture: $arch" ;;
-  esac
-
-  echo "${os}-${arch}"
 }
 
-# Check dependencies
 check_deps() {
-  for cmd in curl tar; do
+  for cmd in curl jq; do
     if ! command -v "$cmd" &>/dev/null; then
       error "$cmd is required but not installed."
     fi
   done
 }
 
-# Get latest version from GitHub
-get_latest_version() {
-  local version
-  version=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null | grep '"tag_name"' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-  if [ -z "$version" ]; then
-    error "Could not determine latest version. Check your internet connection."
+get_release_json() {
+  local tag="$1"
+  if [ "$tag" = "latest" ]; then
+    curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest"
+  else
+    curl -fsSL "https://api.github.com/repos/${REPO}/releases/tags/${tag}"
   fi
-  echo "$version"
 }
 
-# Download and install
-install_nonaterm() {
-  local platform="$1"
-  local version="$2"
-  local archive_name download_url temp_dir
+find_asset_url() {
+  local json="$1" pattern="$2"
+  echo "$json" | jq -r --arg p "$pattern" '.assets[] | select(.name | test($p)) | .browser_download_url' | head -1
+}
 
-  if [ "$platform" = "macos-x64" ] || [ "$platform" = "macos-aarch64" ]; then
-    archive_name="Nonaterm-${version}-${platform}.app.tar.gz"
-  else
-    archive_name="Nonaterm-${version}-${platform}.tar.gz"
+install_macos() {
+  local release_json="$1"
+  local dmg_url
+  dmg_url=$(find_asset_url "$release_json" "\\.dmg$")
+
+  if [ -z "$dmg_url" ]; then
+    error "No .dmg found in this release."
   fi
 
-  download_url="https://github.com/${REPO}/releases/download/${version}/${archive_name}"
+  local temp_dir dmg_path volume
+  temp_dir=$(mktemp -d)
+  trap 'rm -rf "$temp_dir"; hdiutil detach "$volume" 2>/dev/null || true' EXIT
 
-  info "Downloading Nonaterm ${version} for ${platform}..."
+  info "Downloading DMG..."
+  dmg_path="${temp_dir}/Nonaterm.dmg"
+  curl -fSL -o "$dmg_path" "$dmg_url"
+
+  info "Mounting DMG..."
+  volume=$(hdiutil attach "$dmg_path" -nobrowse -readonly 2>/dev/null | grep "/Volumes/" | sed 's/.*\(\/Volumes\/.*\)/\1/' | head -1)
+
+  local app_src="${volume}/Nonaterm.app"
+  local app_dst="/Applications/Nonaterm.app"
+
+  if [ -d "$app_dst" ]; then
+    info "Removing previous installation..."
+    rm -rf "$app_dst"
+  fi
+
+  info "Copying to /Applications..."
+  cp -R "$app_src" "$app_dst"
+  hdiutil detach "$volume" 2>/dev/null || true
+  trap 'rm -rf "$temp_dir"' EXIT
+
+  success "Installed to /Applications/Nonaterm.app"
+  echo ""
+  echo "Launch with: open /Applications/Nonaterm.app"
+}
+
+install_linux() {
+  local release_json="$1"
+
+  local deb_url appimage_url
+  deb_url=$(find_asset_url "$release_json" "\\.deb$")
+  appimage_url=$(find_asset_url "$release_json" "\\.AppImage$")
+
+  info "Choose installation method:"
+  if [ -n "$deb_url" ]; then echo "  1) .deb package (Debian/Ubuntu)"; fi
+  if [ -n "$appimage_url" ]; then echo "  2) AppImage (universal, no install)"; fi
+
+  local choice
+  read -rp "Selection: " choice
+
+  local temp_dir
   temp_dir=$(mktemp -d)
   trap 'rm -rf "$temp_dir"' EXIT
 
-  if ! curl -fsSL -o "${temp_dir}/${archive_name}" "$download_url"; then
-    error "Download failed. URL: ${download_url}"
-  fi
-
-  info "Extracting..."
-  tar -xzf "${temp_dir}/${archive_name}" -C "$temp_dir"
-
-  # Install
-  mkdir -p "$INSTALL_DIR"
-
-  if [ "$platform" = "macos-x64" ] || [ "$platform" = "macos-aarch64" ]; then
-    # macOS: install to /Applications
-    local app_dir="/Applications/Nonaterm.app"
-    if [ -d "$app_dir" ]; then
-      info "Removing previous installation..."
-      rm -rf "$app_dir"
-    fi
-    cp -R "${temp_dir}/Nonaterm.app" "$app_dir"
-    success "Installed to ${app_dir}"
-    info "Launch with: open /Applications/Nonaterm.app"
-  else
-    # Linux: install binary
-    cp "${temp_dir}/nonaterm" "${INSTALL_DIR}/nonaterm"
-    chmod +x "${INSTALL_DIR}/nonaterm"
-    success "Installed to ${INSTALL_DIR}/nonaterm"
-
-    # Add to PATH if not already there
-    if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
-      warn "Add ${INSTALL_DIR} to your PATH:"
-      echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
+  case "$choice" in
+    1)
+      if [ -z "$deb_url" ]; then error ".deb not found in this release."; fi
+      info "Downloading .deb..."
+      curl -fSL -o "${temp_dir}/nonaterm.deb" "$deb_url"
+      info "Installing with dpkg..."
+      sudo dpkg -i "${temp_dir}/nonaterm.deb" || sudo apt-get install -f -y
+      success "Installed via dpkg."
       echo ""
-      # Try to add to shell profile
-      local shell_profile=""
-      if [ -f "$HOME/.zshrc" ]; then
-        shell_profile="$HOME/.zshrc"
-      elif [ -f "$HOME/.bashrc" ]; then
-        shell_profile="$HOME/.bashrc"
-      elif [ -f "$HOME/.profile" ]; then
-        shell_profile="$HOME/.profile"
+      echo "Launch with: nonaterm"
+      ;;
+    2)
+      if [ -z "$appimage_url" ]; then error "AppImage not found in this release."; fi
+      info "Downloading AppImage..."
+      local install_dir="${HOME}/.local/bin"
+      mkdir -p "$install_dir"
+      curl -fSL -o "${install_dir}/nonaterm" "$appimage_url"
+      chmod +x "${install_dir}/nonaterm"
+      success "Installed to ${install_dir}/nonaterm"
+      if ! echo "$PATH" | grep -q "$install_dir"; then
+        warn "Add ${install_dir} to your PATH:"
+        echo "  export PATH=\"${install_dir}:\$PATH\""
       fi
-      if [ -n "$shell_profile" ]; then
-        echo "export PATH=\"${INSTALL_DIR}:\$PATH\"" >> "$shell_profile"
-        info "Added to ${shell_profile}. Restart your shell or run: source ${shell_profile}"
-      fi
-    fi
-  fi
+      ;;
+    *)
+      error "Invalid selection."
+      ;;
+  esac
 }
 
-# Main
 main() {
   info "Nonaterm Installer"
   echo ""
 
   check_deps
 
-  local platform
-  platform=$(detect_platform)
-  info "Platform: ${platform}"
+  local os
+  os=$(detect_os)
+  info "Platform: ${os}"
 
-  local version
-  if [ "$VERSION" = "latest" ]; then
-    version=$(get_latest_version)
-  else
-    version="$VERSION"
-  fi
-  info "Version: ${version}"
+  local release_json tag
+  release_json=$(get_release_json "$VERSION")
+  tag=$(echo "$release_json" | jq -r '.tag_name')
+  info "Version: ${tag}"
+  echo ""
 
-  install_nonaterm "$platform" "$version"
+  case "$os" in
+    macos) install_macos "$release_json" ;;
+    linux) install_linux "$release_json" ;;
+  esac
 
   echo ""
   success "Installation complete!"
-  echo ""
-  echo "Quick start:"
-  if [[ "$platform" == macos* ]]; then
-    echo "  open /Applications/Nonaterm.app"
-  else
-    echo "  nonaterm"
-  fi
   echo ""
   echo "Documentation: https://github.com/${REPO}#readme"
 }
