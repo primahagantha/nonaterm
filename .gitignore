@@ -41,10 +41,22 @@ logs/
 coverage/
 test-results/
 playwright-report/
+perf-report*.json
+perf-summary.json
+perf-baseline.json
 
 # Claude / AI
 .claude/
 .agents/
+
+# Project docs (internal/dev only)
+FEATURE_CHECKLIST.md
+V1_V2_STATUS.md
+progress.md
+prd.md
+sdd.md
+tdd.md
+skills-lock.json
 
 # Misc
 *.tgz

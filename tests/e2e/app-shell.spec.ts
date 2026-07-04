@@ -8,5 +8,5 @@ test('app shell renders in browser fallback mode', async ({ page }) => {
     page.getByRole('navigation', { name: 'Workspaces' }),
   ).toBeVisible();
   await expect(page.getByText(/fallback|loading|ready|error/i)).toBeVisible();
-  await expect(page.getByLabel('Terminal grid')).toBeVisible();
+  await expect(page.getByLabel('Terminal grid').first()).toBeVisible();
 });
