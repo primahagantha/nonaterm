@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage",
     "test:perf": "vitest run --config vitest.perf.config.ts",
     "test:e2e": "playwright test",
+    "test:e2e:native": "npm --prefix e2e-native test",
     "test:stress": "vitest run --config vitest.stress.config.ts",
     "perf:check": "node scripts/perf-check.mjs",
     "perf:write-baseline": "node scripts/perf-write-baseline.mjs",

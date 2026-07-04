@@ -1,0 +1,45 @@
+name: WebDriver E2E (Native)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  webdriver-windows:
+    name: WebDriver E2E (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install e2e-native dependencies
+        run: npm ci
+        working-directory: e2e-native
+
+      - name: Install tauri-driver
+        run: cargo install tauri-driver --locked
+
+      - name: Install Edge WebDriver
+        run: |
+          cargo install --git https://github.com/chippers/msedgedriver-tool
+          & "$HOME/.cargo/bin/msedgedriver-tool.exe"
+
+      - name: Run WebDriver E2E tests
+        run: npm run test:e2e:native
