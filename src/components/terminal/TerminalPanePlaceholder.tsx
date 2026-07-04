@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { pickFolder } from '@/lib/tauri';
 import { TerminalErrorBoundary } from '@/components/terminal/TerminalErrorBoundary';
 import { ConfirmDialog } from '@/components/shell/Dialogs';
@@ -20,6 +20,7 @@ type TerminalPanePlaceholderProps = {
   startupCommand: string;
   defaultOpen: boolean;
   shell?: string;
+  style?: CSSProperties;
 };
 
 /** Placeholder visual agar layout grid bisa divalidasi sebelum xterm dihubungkan. */
@@ -31,6 +32,7 @@ export function TerminalPanePlaceholder({
   startupCommand,
   defaultOpen,
   shell,
+  style,
 }: TerminalPanePlaceholderProps) {
   const session = useTerminalStore((state) => state.sessions[paneId]);
   const workspace = useWorkspaceStore(
@@ -213,6 +215,7 @@ export function TerminalPanePlaceholder({
       data-pane-id={paneId}
       data-status={session?.status ?? 'idle'}
       data-passthrough={isPassthrough ? 'on' : 'off'}
+      style={style}
     >
       <header className="terminal-pane__header">
         {editingTitle ? (

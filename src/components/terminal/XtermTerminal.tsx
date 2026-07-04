@@ -351,6 +351,8 @@ export function XtermTerminal({
 
     let cleanupOutput = () => {};
     let cleanupExit = () => {};
+    // Declared here so the cleanup closure can access them
+    let _intersectionObserver: IntersectionObserver | null = null;
 
     const setup = async () => {
       try {
@@ -398,13 +400,37 @@ export function XtermTerminal({
           terminal.writeln(`[startup: ${startupCommandRef.current}]`);
         }
 
-        resizeObserver = new ResizeObserver(() => {
-          fitAddon.fit();
-          void ptyResize(paneId, terminal.rows, terminal.cols).catch(
-            () => undefined,
-          );
+        resizeObserver = new ResizeObserver((entries) => {
+          // Skip fit when container is hidden (display:none gives 0×0)
+          const entry = entries[0];
+          if (entry && entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+            fitAddon.fit();
+            void ptyResize(paneId, terminal.rows, terminal.cols).catch(
+              () => undefined,
+            );
+          }
         });
         resizeObserver.observe(containerRef.current!);
+
+        // Re-fit when container becomes visible after being hidden
+        _intersectionObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                requestAnimationFrame(() => {
+                  if (!terminalDisposedRef.current && containerRef.current) {
+                    fitAddon.fit();
+                    void ptyResize(paneId, terminal.rows, terminal.cols).catch(
+                      () => undefined,
+                    );
+                  }
+                });
+              }
+            }
+          },
+          { threshold: 0.01 },
+        );
+        _intersectionObserver.observe(containerRef.current!);
 
         void ptyResize(paneId, terminal.rows, terminal.cols);
       } catch (error) {
@@ -441,6 +467,7 @@ export function XtermTerminal({
       window.removeEventListener('Nonaterm:restart-pane', handleRestart);
       surface.removeEventListener('paste', handlePaste);
       resizeObserver?.disconnect();
+      _intersectionObserver?.disconnect();
       cleanupOutput();
       cleanupExit();
       disposeOnData.dispose();
