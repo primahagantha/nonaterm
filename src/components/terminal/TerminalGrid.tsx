@@ -117,7 +117,8 @@ export function TerminalGrid({ workspace }: TerminalGridProps) {
   panes.forEach((pane, i) => {
     const isFirst = i === 0;
     const isMostRecent = i === panes.length - 1 && panes.length > 1;
-    const defaultOpen = isFirst || isMostRecent;
+    const hasStartupCommand = Boolean(pane.startupCommand?.trim());
+    const defaultOpen = isFirst || isMostRecent || hasStartupCommand;
     const pos = paneGridPosition(i, config.columns);
 
     items.push(

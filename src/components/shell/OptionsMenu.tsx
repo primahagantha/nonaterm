@@ -15,6 +15,7 @@ import {
   templatesMaterialize,
 } from '@/lib/tauri';
 import { AISettingsPanel } from '@/components/shell/AISettingsPanel';
+import { BroadcastPanel } from '@/components/shell/BroadcastPanel';
 import { PromptDialog } from '@/components/shell/Dialogs';
 import { WorktreePanel } from '@/components/shell/WorktreePanel';
 import {
@@ -34,7 +35,7 @@ import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { getKeybindRegistry } from '@/lib/keybindBootstrap';
 import type { ExportPayload, WorkspaceTemplate } from '@/types';
 
-type OptionsSection = 'appearance' | 'config' | 'templates' | 'keybinds' | 'snippets' | 'vault' | 'ai' | 'worktree' | 'about';
+type OptionsSection = 'appearance' | 'config' | 'templates' | 'keybinds' | 'snippets' | 'vault' | 'ai' | 'worktree' | 'about' | 'broadcast';
 
 const FONT_CHOICES = [
   { value: 'Cascadia Code, ui-monospace, monospace', label: 'Cascadia Code' },
@@ -392,6 +393,15 @@ export function OptionsMenu() {
             >
               Snippets
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={section === 'broadcast'}
+              className={`options-menu__tab${section === 'broadcast' ? ' options-menu__tab--active' : ''}`}
+              onClick={() => setSection('broadcast')}
+            >
+              Broadcast
+            </button>
           </div>
 
           <div className="options-menu__content">
@@ -653,6 +663,7 @@ export function OptionsMenu() {
             {section === 'keybinds' ? <KeybindsPanel /> : null}
             {section === 'vault' ? <VaultPanel /> : null}
             {section === 'snippets' ? <SnippetsPanel /> : null}
+            {section === 'broadcast' ? <BroadcastPanel workspaceId={useWorkspaceStore.getState().activeWorkspaceId} /> : null}
             {section === 'templates' ? <TemplatesPanel /> : null}
           </div>
         </div>

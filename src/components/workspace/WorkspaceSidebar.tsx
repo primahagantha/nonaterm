@@ -6,8 +6,6 @@ import {
 } from '@/lib/tauri';
 import { ConfirmDialog } from '@/components/shell/Dialogs';
 import { AttentionInbox } from '@/components/shell/AttentionInbox';
-import { BroadcastPanel } from '@/components/shell/BroadcastPanel';
-import { SnippetPanel } from '@/components/shell/SnippetPanel';
 import { WorkspaceWidget } from '@/components/shell/WorkspaceWidget';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTerminalStore } from '@/stores/terminalStore';
@@ -205,8 +203,6 @@ export function WorkspaceSidebar() {
           <div className="workspace-sidebar__divider" />
 
           <AttentionInbox />
-          <BroadcastPanel workspaceId={activeWorkspaceId} />
-          <SnippetPanel />
           <WorkspaceWidget workspaceId={activeWorkspaceId} />
 
           <nav className="workspace-list" aria-label="Workspaces">
