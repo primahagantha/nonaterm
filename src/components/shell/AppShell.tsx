@@ -201,6 +201,15 @@ export function AppShell() {
   const renameWorkspace = useWorkspaceStore((state) => state.renameWorkspace);
   const [editingName, setEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState('');
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
+
+  // Listen for diagnostics toggle from Settings
+  useEffect(() => {
+    const handler = () => setShowDiagnostics((v) => !v);
+    window.addEventListener('Nonaterm:toggle-diagnostics', handler);
+    return () => window.removeEventListener('Nonaterm:toggle-diagnostics', handler);
+  }, []);
 
   // When window dibuka via workspace_open_in_new_window, backend
   // menyuntik `window.location.hash = '#workspace=<id>'` lewat
@@ -382,6 +391,16 @@ export function AppShell() {
             </button>
             <button
               type="button"
+              className={`btn btn--sm${broadcastOpen ? ' btn--primary' : ''}`}
+              onClick={() => setBroadcastOpen(!broadcastOpen)}
+              title="Broadcast input to multiple terminals"
+              aria-label="Toggle broadcast input"
+              aria-pressed={broadcastOpen}
+            >
+              📡
+            </button>
+            <button
+              type="button"
               className="icon-button shortcuts-button"
               onClick={() => setShortcutsOpen(true)}
               title="Show keyboard shortcuts (Ctrl+.)"
@@ -394,7 +413,7 @@ export function AppShell() {
             <OptionsMenu />
           </div>
         </header>
-        {diagnostics ? (
+        {diagnostics && showDiagnostics ? (
           <section
             className="diagnostics-banner"
             aria-label="Diagnostics summary"
@@ -408,6 +427,14 @@ export function AppShell() {
             <span aria-hidden="true">·</span>
             <strong>crash reports</strong>
             <span>{diagnostics.recentCrashReports.length}</span>
+            <button
+              type="button"
+              className="btn btn--sm btn--ghost"
+              onClick={() => setShowDiagnostics(false)}
+              aria-label="Hide diagnostics"
+            >
+              ✕
+            </button>
           </section>
         ) : null}
         <UpdateChecker />
@@ -415,7 +442,7 @@ export function AppShell() {
           <>
             <ProjectRulesBanner cwd={activeWorkspace.panes[0]?.cwd} />
             <TerminalLauncher />
-            <BroadcastPanel workspaceId={activeWorkspace.id} />
+            {broadcastOpen ? <BroadcastPanel workspaceId={activeWorkspace.id} /> : null}
             {/* Render ALL workspace grids to keep PTY sessions alive on switch */}
             {workspaces.map((ws) => (
               <div

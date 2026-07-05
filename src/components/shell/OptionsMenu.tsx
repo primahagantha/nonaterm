@@ -658,6 +658,23 @@ export function OptionsMenu() {
                     <dd>{diagnostics?.logDir ?? '—'}</dd>
                   </div>
                 </dl>
+                <div className="options-menu__field" style={{ marginTop: '1rem' }}>
+                  <label className="options-menu__label">
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      onChange={() => {
+                        // This will be connected to AppShell's showDiagnostics state
+                        // via a global event for now
+                        window.dispatchEvent(new CustomEvent('Nonaterm:toggle-diagnostics'));
+                      }}
+                    />
+                    {' '}Show developer diagnostics bar
+                  </label>
+                  <p className="options-menu__hint">
+                    Shows log file and crash report count in the main view.
+                  </p>
+                </div>
               </div>
             ) : null}
             {section === 'keybinds' ? <KeybindsPanel /> : null}

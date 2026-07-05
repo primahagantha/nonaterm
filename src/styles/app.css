@@ -1187,7 +1187,7 @@ select {
 /* ================== TERMINAL GRID ================== */
 .terminal-grid {
   display: grid;
-  gap: var(--tw-space-3);
+  gap: 2px;
   flex: 1;
   min-height: 0;
   align-content: stretch;
@@ -1246,10 +1246,10 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--tw-space-2);
-  padding: 0.5rem 0.75rem;
+  gap: var(--tw-space-1);
+  padding: 0.25rem 0.5rem;
   background: color-mix(in srgb, var(--tw-panel) 60%, transparent);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   border-bottom: 1px solid var(--tw-panel-border);
   flex-shrink: 0;
 }
