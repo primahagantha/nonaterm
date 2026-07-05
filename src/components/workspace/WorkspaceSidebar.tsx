@@ -120,12 +120,16 @@ export function WorkspaceSidebar() {
     closeWorkspace(workspaceId);
   };
 
+  const [detachError, setDetachError] = useState<string | null>(null);
+
   const handleDetach = async (workspaceId: string) => {
+    setDetachError(null);
     try {
       await workspaceOpenInNewWindow(workspaceId);
     } catch (err) {
-      // No-op: backend Tauri command akan surface error di console
-      console.error('Failed to detach workspace', err);
+      const msg = err instanceof Error ? err.message : 'Failed to detach workspace';
+      setDetachError(msg);
+      setTimeout(() => setDetachError(null), 5000);
     }
   };
 
@@ -172,6 +176,7 @@ export function WorkspaceSidebar() {
     <aside
       className={`workspace-sidebar${collapsed ? ' workspace-sidebar--collapsed' : ''}`}
       aria-label="Workspaces"
+      data-detach-error={detachError ?? undefined}
     >
       <div className="workspace-sidebar__brand">
         <span className="workspace-sidebar__logo" aria-hidden="true">
@@ -242,7 +247,7 @@ export function WorkspaceSidebar() {
                       <button
                         type="button"
                         className="workspace-list__select"
-                        onClick={() => setActiveWorkspace(workspace.id)}
+                        onClick={() => useWorkspaceStore.getState().setActiveWorkspace(workspace.id)}
                         onDragStart={(e) => {
                           e.dataTransfer.setData('text/plain', workspace.id);
                           e.dataTransfer.effectAllowed = 'move';

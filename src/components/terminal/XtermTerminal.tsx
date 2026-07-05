@@ -368,14 +368,33 @@ export function XtermTerminal({
         cleanupOutput = unlistenOutput;
         cleanupExit = unlistenExit;
 
-        const session = await ptySpawn({
-          workspaceId,
-          paneId,
-          cwd: cwdRef.current,
-          shell: shellRef.current,
-          rows: terminal.rows,
-          cols: terminal.cols,
-        });
+        let session;
+        try {
+          session = await ptySpawn({
+            workspaceId,
+            paneId,
+            cwd: cwdRef.current,
+            shell: shellRef.current,
+            rows: terminal.rows,
+            cols: terminal.cols,
+          });
+        } catch (spawnErr) {
+          // Retry with default shell if custom shell fails
+          const errMsg = spawnErr instanceof Error ? spawnErr.message : String(spawnErr);
+          if (errMsg.includes('not found') || errMsg.includes('No such file') || errMsg.includes('系统找不到')) {
+            terminal.writeln(`[shell not found: ${shellRef.current ?? 'default'}, retrying with system default...]`);
+            session = await ptySpawn({
+              workspaceId,
+              paneId,
+              cwd: cwdRef.current,
+              shell: undefined,
+              rows: terminal.rows,
+              cols: terminal.cols,
+            });
+          } else {
+            throw spawnErr;
+          }
+        }
 
         if (terminalDisposedRef.current) {
           closedRef.current = true;
