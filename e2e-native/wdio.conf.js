@@ -30,7 +30,7 @@ export const config = {
     {
       maxInstances: 1,
       'tauri:options': {
-        application: path.resolve(rootDir, 'src-tauri', 'target', 'debug', 'nonaterm'),
+        application: path.resolve(rootDir, 'src-tauri', 'target', 'release', 'nonaterm'),
       },
     },
   ],
@@ -41,14 +41,19 @@ export const config = {
     timeout: 60000,
   },
 
-  // Build the Tauri app in debug mode before tests
+  // Skip build if binary already exists (CI builds separately)
   onPrepare: () => {
-    console.log('[wdio] Building Tauri app (debug)...');
-    spawnSync('npm', ['run', 'tauri', 'build', '--', '--debug', '--no-bundle'], {
-      cwd: rootDir,
-      stdio: 'inherit',
-      shell: true,
-    });
+    const binary = path.resolve(rootDir, 'src-tauri', 'target', 'release', 'nonaterm.exe');
+    if (fs.existsSync(binary)) {
+      console.log(`[wdio] Using existing binary: ${binary}`);
+    } else {
+      console.log('[wdio] Building Tauri app...');
+      spawnSync('npm', ['run', 'tauri', 'build', '--no-bundle'], {
+        cwd: rootDir,
+        stdio: 'inherit',
+        shell: true,
+      });
+    }
   },
 
   // Start tauri-driver before session
