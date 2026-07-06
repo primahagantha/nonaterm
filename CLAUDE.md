@@ -68,3 +68,46 @@ npm run lint             # ESLint
 - Workspace switch uses `display: none` to keep terminals alive
 - Passthrough mode forwards all keystrokes to the terminal program
 - xterm.js uses WebGL renderer for performance
+
+## Current Work: Settings UI Rework (branch: `rework/settings-ui`)
+
+**PR**: https://github.com/RegenadeJester/nonaterm/pull/19
+
+### Completed (✅)
+
+| Step | Feature | Files |
+|------|---------|-------|
+| 1 | **Fullpage settings** (not modal overlay) | `AppShell.tsx`, `SettingsPage.tsx`, `OptionsMenu.tsx` |
+| 2 | **Card-based layout** (2-col grid, responsive) | `app.css` |
+| 3 | **12 sections**: Appearance, Terminal, Quick Launch, AI, SSH, Broadcast, Keybinds, Templates, Snippets, Config, Git, About | `SettingsPage.tsx` |
+| 4 | **SSH connection manager** | `SettingsPage.tsx`, `settingsStore.ts` |
+| 5 | **Quick Launch presets** | `SettingsPage.tsx`, `settingsStore.ts` |
+| 6 | **AI redesign** (provider cards, params, quick add) | `AISettingsPanel.tsx` |
+| 7 | **New terminal settings** (cursor, ligatures, line height, padding, GPU) | `settingsStore.ts` |
+| 8 | **LogViewer enhanced** (search, export, counts) | `LogViewer.tsx` |
+| 9 | **CI/CD fixes** | `.github/workflows/` |
+| 10 | **Tests pass** (67 E2E, 266 unit) | test files |
+| 11 | **Installer fixes** (cross-distro) | `install.sh`, `README.md` |
+
+### New settingsStore fields
+
+`terminalCursorStyle`, `terminalCursorBlink`, `terminalFontLigatures`, `terminalLineHeight`, `terminalPadding`, `notificationSound`, `notificationDesktop`, `terminalGpuAcceleration`, `terminalMaxRenderRate`, `sshConnections[]` + CRUD actions
+
+### Next Steps (TODO)
+
+| Step | What | Priority |
+|------|------|----------|
+| 3 | Broadcast redesign (pane selector, history, macros) | Medium |
+| 4 | Template Marketplace (GitHub integration) | Medium |
+| 5 | Git redesign (worktree, branch, stash, history) | Medium |
+| 6 | Config redesign (JSON editor, diff, validation) | Medium |
+| 7 | WCAG accessibility audit | High |
+| 8 | E2E tests for all new settings | High |
+
+### Architecture Notes
+
+- `OptionsMenu.tsx` = trigger button only (15 lines) — UI lives in `SettingsPage.tsx`
+- Settings renders inside `app-main` when `optionsOpen=true`
+- Header/diagnostics hidden when settings open
+- Nav items have `role="tab"` + `aria-selected`
+- Plan: `docs/plans/settings-rework.md`
