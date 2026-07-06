@@ -294,7 +294,7 @@ export function AppShell() {
       <WorkspaceSidebar />
       <FirstLaunchTooltip />
       <main className="app-main">
-        <header className="workspace-header">
+        {!settingsOpen && <header className="workspace-header">
           <div className="workspace-header__brand">
             <span
               className="workspace-header__brand-mark"
@@ -414,32 +414,36 @@ export function AppShell() {
             </button>
             <OptionsMenu />
           </div>
-        </header>
-        {diagnostics && showDiagnostics ? (
-          <section
-            className="diagnostics-banner"
-            aria-label="Diagnostics summary"
-          >
-            <strong>log</strong>
-            <span>
-              {diagnostics.latestLogFile
-                ? diagnostics.latestLogFile.split(/[\\/]/).pop()
-                : diagnostics.logDir}
-            </span>
-            <span aria-hidden="true">·</span>
-            <strong>crash reports</strong>
-            <span>{diagnostics.recentCrashReports.length}</span>
-            <button
-              type="button"
-              className="btn btn--sm btn--ghost"
-              onClick={() => setShowDiagnostics(false)}
-              aria-label="Hide diagnostics"
-            >
-              ✕
-            </button>
-          </section>
-        ) : null}
-        <UpdateChecker />
+        </header>}
+        {!settingsOpen && (
+          <>
+            {diagnostics && showDiagnostics ? (
+              <section
+                className="diagnostics-banner"
+                aria-label="Diagnostics summary"
+              >
+                <strong>log</strong>
+                <span>
+                  {diagnostics.latestLogFile
+                    ? diagnostics.latestLogFile.split(/[\\/]/).pop()
+                    : diagnostics.logDir}
+                </span>
+                <span aria-hidden="true">·</span>
+                <strong>crash reports</strong>
+                <span>{diagnostics.recentCrashReports.length}</span>
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost"
+                  onClick={() => setShowDiagnostics(false)}
+                  aria-label="Hide diagnostics"
+                >
+                  ✕
+                </button>
+              </section>
+            ) : null}
+            <UpdateChecker />
+          </>
+        )}
         {settingsOpen ? (
           <SettingsPage />
         ) : activeWorkspace ? (

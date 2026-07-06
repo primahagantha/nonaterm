@@ -657,7 +657,7 @@ function ConfigSection() {
     <div className="settings-section-grid">
       <SettingsCard title="Global Hotkey" icon="⌨" description="System-wide shortcut to show/hide Nonaterm.">
         <div className="settings-form-row">
-          <input type="text" className="settings-input" value={globalHotkey} onChange={(e) => setGlobalHotkey(e.target.value)} placeholder="e.g. Ctrl+Shift+`" />
+          <input type="text" className="settings-input" aria-label="Global hotkey" value={globalHotkey} onChange={(e) => setGlobalHotkey(e.target.value)} placeholder="e.g. Ctrl+Shift+`" />
           {isTauriRuntime() ? (
             <button type="button" className="btn btn--sm btn--ghost" onClick={() => void systemRegisterGlobalHotkey(globalHotkey)}>Register</button>
           ) : null}
@@ -807,6 +807,8 @@ export function SettingsPage() {
             <button
               key={s.id}
               type="button"
+              role="tab"
+              aria-selected={section === s.id}
               className={`settings-nav__item${section === s.id ? ' settings-nav__item--active' : ''}`}
               onClick={() => setSection(s.id)}
             >

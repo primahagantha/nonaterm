@@ -3981,6 +3981,8 @@ select {
   min-height: 0;
   background: var(--tw-bg);
   animation: fade-in var(--tw-motion-fast) var(--tw-ease);
+  position: relative;
+  z-index: 1;
 }
 
 .settings-header {

@@ -29,8 +29,8 @@ test.describe('Workspace Templates', () => {
     const useButtons = page.getByRole('button', { name: /use template/i });
     await useButtons.first().click();
 
-    // Should close the options menu and show the new workspace
-    await expect(page.getByRole('button', { name: /open options menu/i })).toBeVisible();
+    // Should show success message
+    await expect(page.getByText(/created/i)).toBeVisible({ timeout: 5000 });
   });
 
   test('templates panel shows empty state when no templates', async ({ page }) => {
