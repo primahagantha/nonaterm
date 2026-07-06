@@ -91,7 +91,7 @@ Or download directly from [GitHub Releases](https://github.com/RegenadeJester/no
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-Downloads DMG and installs to `/Applications`. Works on both Intel and Apple Silicon.
+Downloads DMG and installs to `/Applications`. Auto-installs Xcode CLI tools if missing. Works on both Intel and Apple Silicon.
 
 ### Linux
 
@@ -101,7 +101,7 @@ Downloads DMG and installs to `/Applications`. Works on both Intel and Apple Sil
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-The installer auto-detects your distro and picks the best package format.
+The installer auto-detects your distro, installs required system dependencies (WebKit2GTK, GTK3, etc.), and picks the best package format.
 
 **Or force a specific format:**
 

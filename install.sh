@@ -104,13 +104,168 @@ detect_distro_family() {
   echo "unknown"
 }
 
-# ── Dependencies ──────────────────────────────────────────────────────
+# ── Base tool dependencies (curl, jq) ────────────────────────────────
 check_deps() {
   for cmd in curl jq; do
     if ! command -v "$cmd" &>/dev/null; then
-      error "$cmd is required but not installed. Install it first:\n  Debian/Ubuntu: sudo apt install curl jq\n  Fedora: sudo dnf install curl jq\n  Arch: sudo pacman -S curl jq\n  macOS: brew install curl jq"
+      warn "$cmd not found — attempting to install..."
+      install_base_deps
+      break
     fi
   done
+  # Verify after install attempt
+  for cmd in curl jq; do
+    if ! command -v "$cmd" &>/dev/null; then
+      error "$cmd is required but could not be auto-installed.\n  Debian/Ubuntu: sudo apt install curl jq\n  Fedora: sudo dnf install curl jq\n  Arch: sudo pacman -S curl jq\n  macOS: brew install curl jq"
+    fi
+  done
+}
+
+install_base_deps() {
+  local os
+  os=$(detect_os)
+  if [ "$os" = "macos" ]; then
+    if command -v brew &>/dev/null; then
+      brew install curl jq
+    else
+      error "Homebrew not found. Install it first: https://brew.sh"
+    fi
+    return
+  fi
+
+  local distro
+  distro=$(detect_distro_family)
+  case "$distro" in
+    debian) sudo apt-get update -qq && sudo apt-get install -y -qq curl jq ;;
+    fedora) sudo dnf install -y curl jq ;;
+    arch)   sudo pacman -S --noconfirm curl jq ;;
+    suse)   sudo zypper install -y curl jq ;;
+    alpine) sudo apk add curl jq ;;
+    void)   sudo xbps-install -Sy curl jq ;;
+    *)      error "Cannot auto-install curl/jq for this distro. Install manually." ;;
+  esac
+}
+
+# ── System runtime dependencies (Tauri/WebKit/GTK) ───────────────────
+install_system_deps() {
+  local os="$1" format="${2:-}"
+  local distro
+
+  if [ "$os" = "macos" ]; then
+    install_macos_deps
+    return
+  fi
+
+  distro=$(detect_distro_family)
+  info "Installing system dependencies for ${distro}..."
+
+  case "$distro" in
+    debian)  install_debian_deps "$format" ;;
+    fedora)  install_fedora_deps "$format" ;;
+    arch)    install_arch_deps "$format" ;;
+    suse)    install_suse_deps "$format" ;;
+    alpine)  install_alpine_deps ;;
+    void)    install_void_deps ;;
+    *)
+      warn "Unknown distro — skipping auto dependency install."
+      warn "You may need: webkit2gtk, gtk3, libappindicator, librsvg"
+      ;;
+  esac
+}
+
+install_macos_deps() {
+  # macOS DMG is self-contained, but need Xcode CLI tools for some features
+  if ! xcode-select -p &>/dev/null; then
+    info "Installing Xcode Command Line Tools..."
+    xcode-select --install 2>/dev/null || true
+    warn "If a dialog appeared, please complete the Xcode install, then re-run this script."
+  else
+    info "Xcode CLI tools already installed."
+  fi
+}
+
+install_debian_deps() {
+  local format="$1"
+  # .deb handles its own deps via dpkg, but for AppImage we need runtime libs
+  if [ "$format" = "appimage" ]; then
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq \
+      libwebkit2gtk-4.1-0 \
+      libgtk-3-0 \
+      libayatana-appindicator3-1 \
+      librsvg2-common \
+      libjavascriptcoregtk-4.1-0 \
+      libsoup-3.0-0 \
+      libgdk-pixbuf-2.0-0
+  else
+    # .deb install will pull deps automatically, but ensure base libs
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq \
+      libwebkit2gtk-4.1-0 \
+      libgtk-3-0 \
+      librsvg2-common
+  fi
+}
+
+install_fedora_deps() {
+  local format="$1"
+  if [ "$format" = "appimage" ]; then
+    sudo dnf install -y \
+      webkit2gtk4.1 \
+      gtk3 \
+      libappindicator-gtk3 \
+      librsvg2 \
+      javascriptcoregtk4.1 \
+      libsoup3
+  else
+    # .rpm install will pull deps, but ensure base libs
+    sudo dnf install -y \
+      webkit2gtk4.1 \
+      gtk3 \
+      librsvg2
+  fi
+}
+
+install_arch_deps() {
+  local format="$1"
+  # Arch always needs manual deps (AppImage or otherwise)
+  sudo pacman -S --noconfirm --needed \
+    webkit2gtk-4.1 \
+    gtk3 \
+    libappindicator-gtk3 \
+    librsvg
+}
+
+install_suse_deps() {
+  local format="$1"
+  if [ "$format" = "appimage" ]; then
+    sudo zypper install -y \
+      webkit2gtk-4_1-devel \
+      gtk3-devel \
+      libappindicator3-devel \
+      librsvg-devel \
+      libjavascriptcoregtk-4_1-0 \
+      libsoup-3_0-0
+  else
+    sudo zypper install -y \
+      webkit2gtk-4_1-devel \
+      gtk3-devel \
+      librsvg-devel
+  fi
+}
+
+install_alpine_deps() {
+  sudo apk add \
+    webkit2gtk-4.1 \
+    gtk+3.0 \
+    librsvg
+}
+
+install_void_deps() {
+  sudo xbps-install -Sy \
+    webkit2gtk \
+    gtk+3 \
+    librsvg
 }
 
 # ── GitHub release ────────────────────────────────────────────────────
@@ -131,6 +286,10 @@ find_asset_url() {
 # ── macOS install ─────────────────────────────────────────────────────
 install_macos() {
   local release_json="$1"
+
+  # Auto-install macOS dependencies
+  install_system_deps "macos"
+
   local dmg_url
   dmg_url=$(find_asset_url "$release_json" "\\.dmg$")
 
@@ -295,6 +454,9 @@ install_linux() {
       error "Invalid selection: $choice"
     fi
   fi
+
+  # Auto-install system dependencies
+  install_system_deps "linux" "$format"
 
   local temp_dir
   temp_dir=$(mktemp -d)
