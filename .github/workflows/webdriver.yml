@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: webdriver-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   webdriver-windows:
     name: WebDriver E2E (Windows)
@@ -36,10 +40,29 @@ jobs:
       - name: Install tauri-driver
         run: cargo install tauri-driver --locked
 
-      - name: Install Edge WebDriver
+      - name: Get Edge version
+        id: edge
+        shell: pwsh
         run: |
-          cargo install --git https://github.com/chippers/msedgedriver-tool
-          & "$HOME/.cargo/bin/msedgedriver-tool.exe"
+          $version = (Get-Item "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -ErrorAction SilentlyContinue).VersionInfo.ProductVersion
+          if (-not $version) {
+            $version = (Get-Item "C:\Program Files\Microsoft\Edge\Application\msedge.exe" -ErrorAction SilentlyContinue).VersionInfo.ProductVersion
+          }
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Download Edge WebDriver
+        shell: pwsh
+        run: |
+          $version = "${{ steps.edge.outputs.version }}"
+          $url = "https://msedgedriver.azureedge.net/$version/edgedriver_win64.zip"
+          Invoke-WebRequest -Uri $url -OutFile "edgedriver.zip"
+          Expand-Archive -Path "edgedriver.zip" -DestinationPath "." -Force
+          Copy-Item "msedgedriver.exe" -Destination "$HOME\.cargo\bin\msedgedriver.exe" -Force
+
+      - name: Build Tauri app
+        run: npx tauri build --no-bundle
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
 
       - name: Run WebDriver E2E tests
         run: npm run test:e2e:native

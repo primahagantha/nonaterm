@@ -9,7 +9,7 @@ test.describe('Auto-Restart Policy', () => {
     // Open options menu
     await page.getByRole('button', { name: /open options menu/i }).click();
 
-    // Options menu should be visible
-    await expect(page.getByRole('button', { name: /open options menu/i })).toBeVisible();
+    // Settings page should be visible
+    await expect(page.getByRole('dialog', { name: /settings/i })).toBeVisible();
   });
 });

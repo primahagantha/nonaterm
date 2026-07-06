@@ -1,14 +1,10 @@
 import { act } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { OptionsMenu } from '@/components/shell/OptionsMenu';
+import { SettingsPage } from '@/components/shell/SettingsPage';
 import { THEMES, useSettingsStore } from '@/stores/settingsStore';
 
-const { stateExportConfigMock } = vi.hoisted(() => ({
-  stateExportConfigMock: vi.fn(),
-}));
-
 vi.mock('@/lib/tauri', () => ({
-  stateExportConfig: stateExportConfigMock,
+  stateExportConfig: vi.fn(),
   stateImportConfig: vi.fn(),
   stateSaveSnapshot: vi.fn(),
 }));
@@ -32,9 +28,8 @@ describe('theme registry', () => {
   });
 });
 
-describe('OptionsMenu theme picker', () => {
+describe('SettingsPage theme picker', () => {
   beforeEach(() => {
-    stateExportConfigMock.mockReset();
     useSettingsStore.setState({
       optionsOpen: false,
       themeMode: 'light',
@@ -45,7 +40,7 @@ describe('OptionsMenu theme picker', () => {
   });
 
   it('renders a card for every theme', () => {
-    render(<OptionsMenu />);
+    render(<SettingsPage />);
     act(() => {
       useSettingsStore.getState().setOptionsOpen(true);
     });
@@ -58,7 +53,7 @@ describe('OptionsMenu theme picker', () => {
 
   it('marks the active theme as checked', () => {
     useSettingsStore.setState({ themeId: 'aurora' });
-    render(<OptionsMenu />);
+    render(<SettingsPage />);
     act(() => {
       useSettingsStore.getState().setOptionsOpen(true);
     });
@@ -69,22 +64,24 @@ describe('OptionsMenu theme picker', () => {
   });
 
   it('mode toggle switches light/dark', () => {
-    render(<OptionsMenu />);
+    render(<SettingsPage />);
     act(() => {
       useSettingsStore.getState().setOptionsOpen(true);
     });
-    fireEvent.click(screen.getByRole('radio', { name: /^dark$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /dark/i }));
     expect(useSettingsStore.getState().themeMode).toBe('dark');
     expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
-  it('font size slider updates and clamps', () => {
-    render(<OptionsMenu />);
+  it('font size input updates', () => {
+    render(<SettingsPage />);
     act(() => {
       useSettingsStore.getState().setOptionsOpen(true);
     });
-    const slider = screen.getByLabelText(/terminal font size/i);
-    fireEvent.change(slider, { target: { value: '18' } });
+    const fontInputs = screen.getAllByRole('spinbutton');
+    const sizeInput = fontInputs.find((el) => el.getAttribute('min') === '10');
+    expect(sizeInput).toBeDefined();
+    fireEvent.change(sizeInput!, { target: { value: '18' } });
     expect(useSettingsStore.getState().fontSize).toBe(18);
   });
 });

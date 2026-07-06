@@ -432,6 +432,7 @@ export function XtermTerminal({
         resizeObserver.observe(containerRef.current!);
 
         // Re-fit when container becomes visible after being hidden
+        if (typeof IntersectionObserver === 'undefined') return;
         _intersectionObserver = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {

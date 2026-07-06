@@ -10,6 +10,18 @@ import {
 } from '@/lib/tauri';
 
 export type ThemeMode = 'light' | 'dark';
+export type CursorStyle = 'block' | 'underline' | 'bar';
+
+export type SshConnection = {
+  id: string;
+  name: string;
+  host: string;
+  port: number;
+  user: string;
+  keyPath?: string;
+  agentForwarding: boolean;
+};
+
 export type ThemeId =
   | 'midnight'
   | 'aurora'
@@ -156,6 +168,20 @@ type SettingsStore = {
   customTools: Array<{ id: string; name: string; command: string; icon: string; color: string; description?: string }>;
   passthroughByDefault: boolean;
   shellProfiles: Record<string, { disabledShortcuts: string[]; passthroughByDefault: boolean }>;
+  // Terminal
+  terminalCursorStyle: CursorStyle;
+  terminalCursorBlink: boolean;
+  terminalFontLigatures: boolean;
+  terminalLineHeight: number;
+  terminalPadding: number;
+  // Notifications
+  notificationSound: boolean;
+  notificationDesktop: boolean;
+  // Performance
+  terminalGpuAcceleration: boolean;
+  terminalMaxRenderRate: number;
+  // SSH
+  sshConnections: SshConnection[];
   setTerminalScrollback: (size: number) => void;
   setTerminalBell: (bell: 'none' | 'visual' | 'sound') => void;
   setTerminalCopyOnSelect: (enabled: boolean) => void;
@@ -166,6 +192,18 @@ type SettingsStore = {
   updateCustomTool: (id: string, updates: Partial<{ name: string; command: string; icon: string; color: string; description?: string }>) => void;
   setPassthroughByDefault: (enabled: boolean) => void;
   setShellProfile: (shellId: string, profile: { disabledShortcuts: string[]; passthroughByDefault: boolean }) => void;
+  setTerminalCursorStyle: (style: CursorStyle) => void;
+  setTerminalCursorBlink: (enabled: boolean) => void;
+  setTerminalFontLigatures: (enabled: boolean) => void;
+  setTerminalLineHeight: (height: number) => void;
+  setTerminalPadding: (padding: number) => void;
+  setNotificationSound: (enabled: boolean) => void;
+  setNotificationDesktop: (enabled: boolean) => void;
+  setTerminalGpuAcceleration: (enabled: boolean) => void;
+  setTerminalMaxRenderRate: (fps: number) => void;
+  addSshConnection: (conn: Omit<SshConnection, 'id'>) => void;
+  removeSshConnection: (id: string) => void;
+  updateSshConnection: (id: string, updates: Partial<SshConnection>) => void;
   setTheme: (themeId: ThemeId, mode: ThemeMode) => void;
   setThemeId: (themeId: ThemeId) => void;
   setThemeMode: (mode: ThemeMode) => void;
@@ -227,6 +265,16 @@ type PersistedSettings = {
   customTools?: Array<{ id: string; name: string; command: string; icon: string; color: string; description?: string }>;
   passthroughByDefault?: boolean;
   shellProfiles?: Record<string, { disabledShortcuts: string[]; passthroughByDefault: boolean }>;
+  terminalCursorStyle?: CursorStyle;
+  terminalCursorBlink?: boolean;
+  terminalFontLigatures?: boolean;
+  terminalLineHeight?: number;
+  terminalPadding?: number;
+  notificationSound?: boolean;
+  notificationDesktop?: boolean;
+  terminalGpuAcceleration?: boolean;
+  terminalMaxRenderRate?: number;
+  sshConnections?: SshConnection[];
 };
 
 function readPersisted(): PersistedSettings {
@@ -306,6 +354,16 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   customTools: persisted.customTools ?? [] as Array<{ id: string; name: string; command: string; icon: string; color: string; description?: string }>,
   passthroughByDefault: persisted.passthroughByDefault ?? true,
   shellProfiles: {} as Record<string, { disabledShortcuts: string[]; passthroughByDefault: boolean }>,
+  terminalCursorStyle: persisted.terminalCursorStyle ?? 'block',
+  terminalCursorBlink: persisted.terminalCursorBlink ?? false,
+  terminalFontLigatures: persisted.terminalFontLigatures ?? true,
+  terminalLineHeight: persisted.terminalLineHeight ?? 1.2,
+  terminalPadding: persisted.terminalPadding ?? 4,
+  notificationSound: persisted.notificationSound ?? true,
+  notificationDesktop: persisted.notificationDesktop ?? false,
+  terminalGpuAcceleration: persisted.terminalGpuAcceleration ?? true,
+  terminalMaxRenderRate: persisted.terminalMaxRenderRate ?? 60,
+  sshConnections: persisted.sshConnections ?? [],
   setTheme: (themeId, mode) => {
     set({ themeId, themeMode: mode });
     applyTheme(themeId, mode);
@@ -487,6 +545,63 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     const next = { ...get().shellProfiles, [shellId]: profile };
     set({ shellProfiles: next });
     writePersisted({ shellProfiles: next });
+  },
+  setTerminalCursorStyle: (style) => {
+    set({ terminalCursorStyle: style });
+    writePersisted({ terminalCursorStyle: style });
+  },
+  setTerminalCursorBlink: (enabled) => {
+    set({ terminalCursorBlink: enabled });
+    writePersisted({ terminalCursorBlink: enabled });
+  },
+  setTerminalFontLigatures: (enabled) => {
+    set({ terminalFontLigatures: enabled });
+    writePersisted({ terminalFontLigatures: enabled });
+  },
+  setTerminalLineHeight: (height) => {
+    const clamped = Math.max(1.0, Math.min(2.0, height));
+    set({ terminalLineHeight: clamped });
+    writePersisted({ terminalLineHeight: clamped });
+  },
+  setTerminalPadding: (padding) => {
+    const clamped = Math.max(0, Math.min(20, padding));
+    set({ terminalPadding: clamped });
+    writePersisted({ terminalPadding: clamped });
+  },
+  setNotificationSound: (enabled) => {
+    set({ notificationSound: enabled });
+    writePersisted({ notificationSound: enabled });
+  },
+  setNotificationDesktop: (enabled) => {
+    set({ notificationDesktop: enabled });
+    writePersisted({ notificationDesktop: enabled });
+  },
+  setTerminalGpuAcceleration: (enabled) => {
+    set({ terminalGpuAcceleration: enabled });
+    writePersisted({ terminalGpuAcceleration: enabled });
+  },
+  setTerminalMaxRenderRate: (fps) => {
+    const clamped = Math.max(15, Math.min(120, fps));
+    set({ terminalMaxRenderRate: clamped });
+    writePersisted({ terminalMaxRenderRate: clamped });
+  },
+  addSshConnection: (conn) => {
+    const id = crypto.randomUUID();
+    const next = [...get().sshConnections, { id, ...conn }];
+    set({ sshConnections: next });
+    writePersisted({ sshConnections: next });
+  },
+  removeSshConnection: (id) => {
+    const next = get().sshConnections.filter((c) => c.id !== id);
+    set({ sshConnections: next });
+    writePersisted({ sshConnections: next });
+  },
+  updateSshConnection: (id, updates) => {
+    const next = get().sshConnections.map((c) =>
+      c.id === id ? { ...c, ...updates } : c
+    );
+    set({ sshConnections: next });
+    writePersisted({ sshConnections: next });
   },
   hydrateFromBackend: async () => {
     // Best-effort. Kalau backend tidak reachable (mis. di test

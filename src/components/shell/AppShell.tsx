@@ -13,6 +13,7 @@ import { TokenMeter } from '@/components/shell/TokenMeter';
 import { ErrorBanner } from '@/components/shell/ErrorBanner';
 import { UpdateChecker } from '@/components/shell/UpdateChecker';
 import { OptionsMenu } from '@/components/shell/OptionsMenu';
+import { SettingsPage } from '@/components/shell/SettingsPage';
 import { ShortcutsModal } from '@/components/shell/ShortcutsModal';
 import { CommandPalette } from '@/components/shell/CommandPalette';
 import { LogViewer } from '@/components/shell/LogViewer';
@@ -193,6 +194,7 @@ export function AppShell() {
   const setShortcutsOpen = useSettingsStore((state) => state.setShortcutsOpen);
   const setOptionsOpen = useSettingsStore((state) => state.setOptionsOpen);
   const sidebarCollapsed = useSettingsStore((state) => state.sidebarCollapsed);
+  const settingsOpen = useSettingsStore((state) => state.optionsOpen);
   const themeId = useSettingsStore((state) => state.themeId);
   const viewMode = useUiStore((state) => state.viewMode);
   const togglePassthrough = useSettingsStore(
@@ -292,7 +294,7 @@ export function AppShell() {
       <WorkspaceSidebar />
       <FirstLaunchTooltip />
       <main className="app-main">
-        <header className="workspace-header">
+        {!settingsOpen && <header className="workspace-header">
           <div className="workspace-header__brand">
             <span
               className="workspace-header__brand-mark"
@@ -412,33 +414,39 @@ export function AppShell() {
             </button>
             <OptionsMenu />
           </div>
-        </header>
-        {diagnostics && showDiagnostics ? (
-          <section
-            className="diagnostics-banner"
-            aria-label="Diagnostics summary"
-          >
-            <strong>log</strong>
-            <span>
-              {diagnostics.latestLogFile
-                ? diagnostics.latestLogFile.split(/[\\/]/).pop()
-                : diagnostics.logDir}
-            </span>
-            <span aria-hidden="true">·</span>
-            <strong>crash reports</strong>
-            <span>{diagnostics.recentCrashReports.length}</span>
-            <button
-              type="button"
-              className="btn btn--sm btn--ghost"
-              onClick={() => setShowDiagnostics(false)}
-              aria-label="Hide diagnostics"
-            >
-              ✕
-            </button>
-          </section>
-        ) : null}
-        <UpdateChecker />
-        {activeWorkspace ? (
+        </header>}
+        {!settingsOpen && (
+          <>
+            {diagnostics && showDiagnostics ? (
+              <section
+                className="diagnostics-banner"
+                aria-label="Diagnostics summary"
+              >
+                <strong>log</strong>
+                <span>
+                  {diagnostics.latestLogFile
+                    ? diagnostics.latestLogFile.split(/[\\/]/).pop()
+                    : diagnostics.logDir}
+                </span>
+                <span aria-hidden="true">·</span>
+                <strong>crash reports</strong>
+                <span>{diagnostics.recentCrashReports.length}</span>
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost"
+                  onClick={() => setShowDiagnostics(false)}
+                  aria-label="Hide diagnostics"
+                >
+                  ✕
+                </button>
+              </section>
+            ) : null}
+            <UpdateChecker />
+          </>
+        )}
+        {settingsOpen ? (
+          <SettingsPage />
+        ) : activeWorkspace ? (
           <>
             <ProjectRulesBanner cwd={activeWorkspace.panes[0]?.cwd} />
             <TerminalLauncher />

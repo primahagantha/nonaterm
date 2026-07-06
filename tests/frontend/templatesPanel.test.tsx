@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { OptionsMenu } from '@/components/shell/OptionsMenu';
+import { SettingsPage } from '@/components/shell/SettingsPage';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
@@ -54,7 +54,7 @@ describe('TemplatesPanel', () => {
       paneCount: 2,
     });
 
-    render(<OptionsMenu />);
+    render(<SettingsPage />);
     act(() => {
       useSettingsStore.getState().setOptionsOpen(true);
     });

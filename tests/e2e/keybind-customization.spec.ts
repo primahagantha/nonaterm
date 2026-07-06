@@ -15,16 +15,16 @@ test.describe('Keybind Customization', () => {
     await expect(page.getByText(/Create a new workspace/i)).toBeVisible();
   });
 
-  test('record button is available for each keybind', async ({ page }) => {
+  test('rebind button is available for each keybind', async ({ page }) => {
     await mockTauriRuntime(page, defaultMockResponses());
     await page.goto('/');
 
     await page.getByRole('button', { name: /open options menu/i }).click();
     await page.getByRole('tab', { name: /keybinds/i }).click();
 
-    // Should have Record buttons
-    const recordButtons = page.getByRole('button', { name: /record/i });
-    await expect(recordButtons.first()).toBeVisible();
+    // Should have Rebind buttons
+    const rebindButtons = page.getByRole('button', { name: /rebind/i });
+    await expect(rebindButtons.first()).toBeVisible();
   });
 
   test('reset all to defaults button is present', async ({ page }) => {

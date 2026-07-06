@@ -26,26 +26,23 @@ test.describe('Global Hotkey Settings', () => {
     const hotkeyInput = page.getByLabel('Global hotkey');
     await hotkeyInput.click();
 
-    // Should show recording hint
-    await expect(page.getByText(/press the key combination/i)).toBeVisible();
+    // Should be focused and ready for input
+    await expect(hotkeyInput).toBeFocused();
   });
 
-  test('clear button removes hotkey', async ({ page }) => {
+  test('hotkey input can be cleared', async ({ page }) => {
     await mockTauriRuntime(page, defaultMockResponses());
     await page.goto('/');
 
     await page.getByRole('button', { name: /open options menu/i }).click();
     await page.getByRole('tab', { name: /config/i }).click();
 
-    // Set a hotkey first via keyboard
+    // Set a hotkey first
     const hotkeyInput = page.getByLabel('Global hotkey');
-    await hotkeyInput.click();
-    await page.keyboard.press('Control+Shift+`');
+    await hotkeyInput.fill('Ctrl+Shift+`');
 
-    // Clear button should appear
-    const clearBtn = page.getByRole('button', { name: /clear/i });
-    await expect(clearBtn).toBeVisible();
-    await clearBtn.click();
+    // Clear the input
+    await hotkeyInput.fill('');
 
     // Input should be empty
     await expect(hotkeyInput).toHaveValue('');

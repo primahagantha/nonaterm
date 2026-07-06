@@ -42,7 +42,8 @@ describe('AppShell QA smoke', () => {
 
     expect(screen.getByRole('heading', { name: 'Nonaterm Core' })).toBeInTheDocument();
     expect(screen.getByText('v0.1.0')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Diagnostics summary' })).toBeInTheDocument();
+    // Diagnostics bar is hidden by default (toggle in Settings > About)
+    expect(screen.queryByRole('region', { name: 'Diagnostics summary' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Terminal grid' })).toBeInTheDocument();
   });
 

@@ -105,6 +105,9 @@ test.describe('Config export/import', () => {
       buffer: Buffer.from(importData),
     });
 
+    // Close settings to see the workspace
+    await page.getByRole('button', { name: /close settings/i }).click();
+
     await expect(
       page.getByRole('heading', { name: 'Imported Workspace' }),
     ).toBeVisible({ timeout: 10_000 });
