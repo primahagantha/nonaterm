@@ -441,7 +441,7 @@ function TemplatesPanel() {
                 <span className="settings-card__meta">{t.panes.length} pane{t.panes.length > 1 ? 's' : ''}</span>
               </div>
               <p className="settings-card__desc">{t.description}</p>
-              <button type="button" className="btn btn--primary btn--sm" onClick={() => void handleUse(t)} disabled={pendingId === t.id}>
+              <button type="button" className="btn btn--primary btn--sm" data-testid={`template-use-${t.id}`} onClick={() => void handleUse(t)} disabled={pendingId === t.id}>
                 {pendingId === t.id ? 'Creating...' : 'Use template'}
               </button>
             </div>
