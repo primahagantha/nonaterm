@@ -792,10 +792,18 @@ export function SettingsPage() {
     if (!optionsOpen) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOptionsOpen(false);
+      // Arrow key nav between sections
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        const idx = SECTIONS.findIndex((s) => s.id === section);
+        const next = e.key === 'ArrowDown' ? Math.min(idx + 1, SECTIONS.length - 1) : Math.max(idx - 1, 0);
+        setSection(SECTIONS[next].id);
+      }
     };
     window.addEventListener('keydown', handler);
+    // Focus first nav item on open
+    panelRef.current?.querySelector<HTMLElement>('.settings-nav__item--active')?.focus();
     return () => window.removeEventListener('keydown', handler);
-  }, [optionsOpen, setOptionsOpen]);
+  }, [optionsOpen, setOptionsOpen, section]);
 
   if (!optionsOpen) return null;
 
