@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: webdriver-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   webdriver-windows:
     name: WebDriver E2E (Windows)
