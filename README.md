@@ -79,11 +79,8 @@ Scattered terminal windows are dead. Nonaterm gives you **named workspaces** wit
 ### Windows
 
 ```powershell
-# PowerShell (recommended)
 irm https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.ps1 | iex
 ```
-
-Or download directly from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/releases/latest) — MSI or EXE installer available.
 
 ### macOS
 
@@ -91,22 +88,15 @@ Or download directly from [GitHub Releases](https://github.com/RegenadeJester/no
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-Downloads DMG and installs to `/Applications`. Works on both Intel and Apple Silicon.
-
 ### Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-Offers `.deb` (Debian/Ubuntu) or AppImage (universal). Or download `.deb` / `.rpm` / `.AppImage` from [Releases](https://github.com/RegenadeJester/nonaterm/releases/latest).
+Auto-detects distro (Debian, Fedora, Arch, Kali, openSUSE, etc.), installs system dependencies, and picks the best package format.
 
-### Manual Download
-
-Download from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/releases):
-- **Windows**: `.msi` or `.exe` installer
-- **macOS**: `.dmg` (Intel & Apple Silicon)
-- **Linux**: `.deb`, `.rpm`, or `.AppImage`
+> **Manual install / force format / dev build** → see [docs/manual.md](docs/manual.md)
 
 ## Shell Support
 
@@ -135,9 +125,7 @@ Download from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/relea
 
 - **Node.js** 20+
 - **Rust** (latest stable) — [rustup.rs](https://rustup.rs/)
-- **Windows**: WebView2 (built into Windows 11)
-- **macOS**: `xcode-select --install`
-- **Linux**: `sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf`
+- Platform-specific deps → see [docs/manual.md](docs/manual.md#prerequisites)
 
 ### Quick Start
 
