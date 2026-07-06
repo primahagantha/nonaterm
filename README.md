@@ -79,11 +79,8 @@ Scattered terminal windows are dead. Nonaterm gives you **named workspaces** wit
 ### Windows
 
 ```powershell
-# PowerShell (recommended)
 irm https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.ps1 | iex
 ```
-
-Or download directly from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/releases/latest) — MSI or EXE installer available.
 
 ### macOS
 
@@ -91,59 +88,15 @@ Or download directly from [GitHub Releases](https://github.com/RegenadeJester/no
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-Downloads DMG and installs to `/Applications`. Auto-installs Xcode CLI tools if missing. Works on both Intel and Apple Silicon.
-
 ### Linux
-
-**Auto-detect (recommended):**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-The installer auto-detects your distro, installs required system dependencies (WebKit2GTK, GTK3, etc.), and picks the best package format.
+Auto-detects distro (Debian, Fedora, Arch, Kali, openSUSE, etc.), installs system dependencies, and picks the best package format.
 
-**Or force a specific format:**
-
-```bash
-# Debian / Ubuntu / Kali / Mint / Pop
-curl -fsSL .../install.sh | bash -s -- --deb
-
-# Fedora / RHEL / Rocky / Alma
-curl -fsSL .../install.sh | bash -s -- --rpm
-
-# Arch / Manjaro / EndeavourOS
-curl -fsSL .../install.sh | bash -s -- --appimage
-
-# openSUSE
-curl -fsSL .../install.sh | bash -s -- --rpm
-
-# Any distro (universal, no root)
-curl -fsSL .../install.sh | bash -s -- --appimage
-```
-
-**Non-interactive (CI / scripting):**
-
-```bash
-curl -fsSL .../install.sh | bash -s -- --yes
-```
-
-| Distro Family | Default Format | Package Manager |
-|---------------|---------------|-----------------|
-| Debian / Ubuntu / Kali / Mint | `.deb` | `dpkg` |
-| Fedora / RHEL / Rocky / Alma | `.rpm` | `dnf` |
-| Arch / Manjaro / EndeavourOS | AppImage | `~/.local/bin` |
-| openSUSE | `.rpm` | `zypper` |
-| Other | AppImage | `~/.local/bin` |
-
-Or download `.deb` / `.rpm` / `.AppImage` directly from [Releases](https://github.com/RegenadeJester/nonaterm/releases/latest).
-
-### Manual Download
-
-Download from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/releases):
-- **Windows**: `.msi` or `.exe` installer
-- **macOS**: `.dmg` (Intel & Apple Silicon)
-- **Linux**: `.deb`, `.rpm`, or `.AppImage`
+> **Manual install / force format / dev build** → see [docs/manual.md](docs/manual.md)
 
 ## Shell Support
 
@@ -172,22 +125,7 @@ Download from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/relea
 
 - **Node.js** 20+
 - **Rust** (latest stable) — [rustup.rs](https://rustup.rs/)
-- **Windows**: WebView2 (built into Windows 11)
-- **macOS**: `xcode-select --install`
-- **Linux**: Install WebView2/GTK dev libs for your distro:
-  ```bash
-  # Debian / Ubuntu / Kali
-  sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-
-  # Fedora / RHEL / Rocky
-  sudo dnf install webkit2gtk4.1-devel gtk3-devel libappindicator-gtk3-devel librsvg2-devel patchelf
-
-  # Arch / Manjaro
-  sudo pacman -S webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf
-
-  # openSUSE
-  sudo zypper install webkit2gtk-4_1-devel gtk3-devel libappindicator3-devel rsvg2-devel patchelf
-  ```
+- Platform-specific deps → see [docs/manual.md](docs/manual.md#prerequisites)
 
 ### Quick Start
 
