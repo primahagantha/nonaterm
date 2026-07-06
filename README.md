@@ -95,11 +95,48 @@ Downloads DMG and installs to `/Applications`. Works on both Intel and Apple Sil
 
 ### Linux
 
+**Auto-detect (recommended):**
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/RegenadeJester/nonaterm/master/install.sh | bash
 ```
 
-Offers `.deb` (Debian/Ubuntu) or AppImage (universal). Or download `.deb` / `.rpm` / `.AppImage` from [Releases](https://github.com/RegenadeJester/nonaterm/releases/latest).
+The installer auto-detects your distro and picks the best package format.
+
+**Or force a specific format:**
+
+```bash
+# Debian / Ubuntu / Kali / Mint / Pop
+curl -fsSL .../install.sh | bash -s -- --deb
+
+# Fedora / RHEL / Rocky / Alma
+curl -fsSL .../install.sh | bash -s -- --rpm
+
+# Arch / Manjaro / EndeavourOS
+curl -fsSL .../install.sh | bash -s -- --appimage
+
+# openSUSE
+curl -fsSL .../install.sh | bash -s -- --rpm
+
+# Any distro (universal, no root)
+curl -fsSL .../install.sh | bash -s -- --appimage
+```
+
+**Non-interactive (CI / scripting):**
+
+```bash
+curl -fsSL .../install.sh | bash -s -- --yes
+```
+
+| Distro Family | Default Format | Package Manager |
+|---------------|---------------|-----------------|
+| Debian / Ubuntu / Kali / Mint | `.deb` | `dpkg` |
+| Fedora / RHEL / Rocky / Alma | `.rpm` | `dnf` |
+| Arch / Manjaro / EndeavourOS | AppImage | `~/.local/bin` |
+| openSUSE | `.rpm` | `zypper` |
+| Other | AppImage | `~/.local/bin` |
+
+Or download `.deb` / `.rpm` / `.AppImage` directly from [Releases](https://github.com/RegenadeJester/nonaterm/releases/latest).
 
 ### Manual Download
 
@@ -137,7 +174,20 @@ Download from [GitHub Releases](https://github.com/RegenadeJester/nonaterm/relea
 - **Rust** (latest stable) — [rustup.rs](https://rustup.rs/)
 - **Windows**: WebView2 (built into Windows 11)
 - **macOS**: `xcode-select --install`
-- **Linux**: `sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf`
+- **Linux**: Install WebView2/GTK dev libs for your distro:
+  ```bash
+  # Debian / Ubuntu / Kali
+  sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+
+  # Fedora / RHEL / Rocky
+  sudo dnf install webkit2gtk4.1-devel gtk3-devel libappindicator-gtk3-devel librsvg2-devel patchelf
+
+  # Arch / Manjaro
+  sudo pacman -S webkit2gtk-4.1 gtk3 libappindicator-gtk3 librsvg patchelf
+
+  # openSUSE
+  sudo zypper install webkit2gtk-4_1-devel gtk3-devel libappindicator3-devel rsvg2-devel patchelf
+  ```
 
 ### Quick Start
 
