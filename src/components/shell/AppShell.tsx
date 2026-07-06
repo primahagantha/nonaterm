@@ -13,6 +13,7 @@ import { TokenMeter } from '@/components/shell/TokenMeter';
 import { ErrorBanner } from '@/components/shell/ErrorBanner';
 import { UpdateChecker } from '@/components/shell/UpdateChecker';
 import { OptionsMenu } from '@/components/shell/OptionsMenu';
+import { SettingsPage } from '@/components/shell/SettingsPage';
 import { ShortcutsModal } from '@/components/shell/ShortcutsModal';
 import { CommandPalette } from '@/components/shell/CommandPalette';
 import { LogViewer } from '@/components/shell/LogViewer';
@@ -193,6 +194,7 @@ export function AppShell() {
   const setShortcutsOpen = useSettingsStore((state) => state.setShortcutsOpen);
   const setOptionsOpen = useSettingsStore((state) => state.setOptionsOpen);
   const sidebarCollapsed = useSettingsStore((state) => state.sidebarCollapsed);
+  const settingsOpen = useSettingsStore((state) => state.optionsOpen);
   const themeId = useSettingsStore((state) => state.themeId);
   const viewMode = useUiStore((state) => state.viewMode);
   const togglePassthrough = useSettingsStore(
@@ -438,7 +440,9 @@ export function AppShell() {
           </section>
         ) : null}
         <UpdateChecker />
-        {activeWorkspace ? (
+        {settingsOpen ? (
+          <SettingsPage />
+        ) : activeWorkspace ? (
           <>
             <ProjectRulesBanner cwd={activeWorkspace.panes[0]?.cwd} />
             <TerminalLauncher />
