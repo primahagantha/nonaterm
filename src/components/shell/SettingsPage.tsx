@@ -808,13 +808,7 @@ export function SettingsPage() {
       case 'quicklaunch':
         return <QuickLaunchSection />;
       case 'ai':
-        return (
-          <div className="settings-section-grid">
-            <SettingsCard title="AI Configuration" icon="🤖" description="Configure AI provider, model, and API keys.">
-              <AISettingsPanel />
-            </SettingsCard>
-          </div>
-        );
+        return <AISettingsPanel />;
       case 'ssh':
         return (
           <div className="settings-section-grid">
