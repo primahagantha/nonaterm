@@ -818,9 +818,7 @@ export function SettingsPage() {
       case 'broadcast':
         return (
           <div className="settings-section-grid">
-            <SettingsCard title="Broadcast Input" icon="📡" description="Send one command to multiple terminals simultaneously.">
-              <BroadcastPanel workspaceId={useWorkspaceStore.getState().activeWorkspaceId} />
-            </SettingsCard>
+            <BroadcastPanel workspaceId={useWorkspaceStore.getState().activeWorkspaceId} />
           </div>
         );
       case 'keybinds':
