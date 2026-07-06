@@ -35,6 +35,7 @@ import type { ExportPayload, WorkspaceTemplate } from '@/types';
 type SettingsSection =
   | 'appearance'
   | 'terminal'
+  | 'quicklaunch'
   | 'ai'
   | 'ssh'
   | 'broadcast'
@@ -48,6 +49,7 @@ type SettingsSection =
 const SECTIONS: { id: SettingsSection; label: string; icon: string; description: string }[] = [
   { id: 'appearance', label: 'Appearance', icon: '🎨', description: 'Theme, fonts, colors' },
   { id: 'terminal', label: 'Terminal', icon: '⌨', description: 'Shell, cursor, behavior' },
+  { id: 'quicklaunch', label: 'Quick Launch', icon: '⚡', description: 'Tool presets, auto-launch' },
   { id: 'ai', label: 'AI', icon: '🤖', description: 'Provider, model, API keys' },
   { id: 'ssh', label: 'SSH', icon: '🔑', description: 'Connections & keys' },
   { id: 'broadcast', label: 'Broadcast', icon: '📡', description: 'Multi-pane commands' },
@@ -679,6 +681,76 @@ function ConfigSection() {
   );
 }
 
+function QuickLaunchSection() {
+  const customTools = useSettingsStore((s) => s.customTools);
+  const addCustomTool = useSettingsStore((s) => s.addCustomTool);
+  const removeCustomTool = useSettingsStore((s) => s.removeCustomTool);
+  const [form, setForm] = useState({ name: '', command: '', icon: '⚡', color: '#3b82f6' });
+
+  const handleAdd = () => {
+    if (!form.name.trim() || !form.command.trim()) return;
+    addCustomTool({ name: form.name.trim(), command: form.command.trim(), icon: form.icon, color: form.color });
+    setForm({ name: '', command: '', icon: '⚡', color: '#3b82f6' });
+  };
+
+  return (
+    <div className="settings-section-grid">
+      <SettingsCard title="Quick Launch Presets" icon="⚡" description="Manage tools that appear in the quick launch toolbar.">
+        <p className="settings-hint">These tools show up in the ⚡ Quick Launch bar in the header. Add your frequently used AI agents and dev tools.</p>
+        {customTools.length > 0 ? (
+          <div className="settings-list">
+            {customTools.map((tool) => (
+              <div key={tool.id} className="settings-list__item">
+                <div className="settings-list__info">
+                  <span style={{ color: tool.color }}>{tool.icon}</span>
+                  <span className="settings-list__name">{tool.name}</span>
+                  <code className="settings-list__code">{tool.command}</code>
+                </div>
+                <button type="button" className="btn btn--sm btn--ghost btn--danger" onClick={() => removeCustomTool(tool.id)} title="Remove">✕</button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="settings-empty">No custom tools added. Default presets (Claude Code, OpenCode, Codex, etc.) are always available.</p>
+        )}
+        <div className="settings-form" style={{ marginTop: '0.5rem' }}>
+          <div className="settings-form-row">
+            <input type="text" className="settings-input" placeholder="Tool name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input type="text" className="settings-input settings-input--grow" placeholder="Command (e.g. aider --model gpt-4)" value={form.command} onChange={(e) => setForm({ ...form, command: e.target.value })} />
+          </div>
+          <div className="settings-form-row">
+            <input type="text" className="settings-input settings-input--narrow" placeholder="Icon" value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} />
+            <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} style={{ width: 32, height: 28, border: 'none', cursor: 'pointer' }} />
+            <button type="button" className="btn btn--primary btn--sm" onClick={handleAdd} disabled={!form.name.trim() || !form.command.trim()}>Add Tool</button>
+          </div>
+        </div>
+      </SettingsCard>
+
+      <SettingsCard title="Default Presets" icon="🔧" description="Built-in tools that are always available.">
+        <div className="settings-list">
+          {[
+            { name: 'Claude Code', command: 'claude', icon: '🤖' },
+            { name: 'OpenCode', command: 'opencode', icon: '📖' },
+            { name: 'Codex', command: 'codex', icon: '🔮' },
+            { name: 'Aider', command: 'aider', icon: '🤝' },
+            { name: 'Git', command: 'git status', icon: '🌿' },
+            { name: 'LazyGit', command: 'lazygit', icon: '🐱' },
+          ].map((preset) => (
+            <div key={preset.name} className="settings-list__item">
+              <div className="settings-list__info">
+                <span>{preset.icon}</span>
+                <span className="settings-list__name">{preset.name}</span>
+                <code className="settings-list__code">{preset.command}</code>
+              </div>
+              <span className="settings-list__code" style={{ opacity: 0.5 }}>built-in</span>
+            </div>
+          ))}
+        </div>
+      </SettingsCard>
+    </div>
+  );
+}
+
 function AboutSection() {
   const appInfo = useUiStore((s) => s.appInfo);
   const diagnostics = useUiStore((s) => s.diagnostics);
@@ -733,6 +805,8 @@ export function SettingsPage() {
         return <AppearanceSection />;
       case 'terminal':
         return <TerminalSection />;
+      case 'quicklaunch':
+        return <QuickLaunchSection />;
       case 'ai':
         return (
           <div className="settings-section-grid">
